@@ -26,6 +26,5 @@ class BilibiliItem(scrapy.Item):
     barrage = scrapy.Field()
     tags = scrapy.Field()
     classes = scrapy.Field()
-
-
     aid = scrapy.Field()
+    file_content=scrapy.Field()

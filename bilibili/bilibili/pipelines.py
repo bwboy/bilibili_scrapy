@@ -11,6 +11,10 @@ import requests, time, urllib.request, re
 from moviepy.editor import *
 import os, sys
 import imageio
+
+import threading
+from concurrent.futures import ThreadPoolExecutor, wait, ALL_COMPLETED, FIRST_COMPLETED
+import random
 imageio.plugins.ffmpeg.download()
 
 class BilibiliPipeline(object):
@@ -19,8 +23,6 @@ class BilibiliPipeline(object):
 
 
 class MysqlPipeline(object):
-
-
     def open_spider(self,spider):
         self.client=connect(
             host='127.0.0.1',
@@ -28,12 +30,11 @@ class MysqlPipeline(object):
             user='wxwmodder',
             password='sxmc321',
             db='scrapy01'
-           
         )
         self.cursor=self.client.cursor()
 
     def process_item(self, item, spider):
-        print(item)
+
         args=[
             item["name"],
             int(item["rank"]),
@@ -62,13 +63,14 @@ class MysqlPipeline(object):
             item["forward"],
             item["barrage"],
             str(item["tags"]),
-            item["classes"]
+            item["classes"],
+            item["file_content"]
         ]
 
 
         sql='insert into bilibili_rank VALUES(0,%s,%s,%s,%s,%s,%s,%s,%s)'
 
-        sql2='insert into bilibili_info VALUES(0,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'
+        sql2='insert into bilibili_info VALUES(0,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'
         self.cursor.execute(sql,args)
         self.cursor.execute(sql2,args2)
         self.client.commit()
@@ -81,6 +83,15 @@ class MysqlPipeline(object):
 
 
 class DownloadVideoPipeline(object):
+    
+    def open_spider(self,spider):
+        self.threads_list=[]
+        self.executer=ThreadPoolExecutor(spider.MAX_THREAD)
+
+    def close_spider(self,spider):
+        wait(self.threads_list, return_when=ALL_COMPLETED)
+        self.executer.shutdown()
+
 
     def process_item(self, item, spider):
 
@@ -124,8 +135,15 @@ class DownloadVideoPipeline(object):
             start_url = start_url + "/?p=" + page
             video_list = self.get_play_list(aid,cid,quality)
             start_time = time.time()
-            self.down_video(video_list, title, start_url, page)
-            self.combine_video(video_list, title)
+            if not os.path.exists(os.path.join(self.download_path, 'bilibili_video', title)):
+                t=self.executer.submit(self.down_video,video_list, title, start_url, page)
+                item["file_content"]=str(os.path.join(self.download_path, 'bilibili_video', title))
+                self.threads_list.append(t)
+            else:
+                print("文件已存在！直接跳过！")
+                item["file_content"]=os.path.join(self.download_path, 'bilibili_video', title)
+            #self.down_video(video_list, title, start_url, page)
+        return item
 
     # 访问API地址
     def get_play_list(self,aid, cid, quality):
@@ -174,6 +192,7 @@ class DownloadVideoPipeline(object):
                 urllib.request.urlretrieve(url=i, filename=os.path.join(currentVideoPath, r'{}.flv'.format(title))
                                         )  # 写成mp4也行  title + '-' + num + '.flv'
             num += 1
+        self.combine_video(video_list, title)
 
     # 合并视频
     def combine_video(self,video_list, title):

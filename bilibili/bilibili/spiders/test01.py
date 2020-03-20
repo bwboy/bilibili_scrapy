@@ -14,16 +14,18 @@ class Test01Spider(scrapy.Spider):
     name = 'test01'
     allowed_domains = ['bilibili.com']
     # start_urls = ['https://www.bilibili.com/ranking/']
-    target_count=2
-    download_dir=r"F:\study_project\webpack\scrapy\bilibili\bilibili\spiders"
+    target_count=5
+    download_dir=r"F:\study_project\webpack\scrapy"
+    webdriver_path=r'F:\study_project\webpack\SeleniumDemo\chromedriver.exe'
+    MAX_THREAD=5
 
     # 实例化一个浏览器对象
     def __init__(self):
-        self.browser = webdriver.Chrome(r'F:\study_project\webpack\SeleniumDemo\chromedriver.exe',chrome_options=chorme_options)
+        self.browser = webdriver.Chrome(self.webdriver_path,chrome_options=chorme_options)
         super().__init__()
 
     def start_requests(self):
-        url = "https://www.bilibili.com/ranking/"
+        url ='https://www.bilibili.com/ranking/all/119/0/3' #"https://www.bilibili.com/ranking/"
         response = scrapy.Request(url,callback=self.parse)
         yield response
 
@@ -56,8 +58,6 @@ class Test01Spider(scrapy.Spider):
             video_meta["review"]=review
             video_meta["author"]=author
             video_meta["score"]=score
-
-
             yield scrapy.Request(url=href,meta={'video_meta':deepcopy(video_meta)},callback=self.parse_detail)
 
     def parse_detail(self, response):
@@ -87,7 +87,7 @@ class Test01Spider(scrapy.Spider):
         video_meta["barrage"]=barrage
         video_meta["tags"]=tags
         video_meta["classes"]=classes
-
+        video_meta["file_content"]="none"
 
         yield video_meta
             # yield{

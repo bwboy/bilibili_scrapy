@@ -19,6 +19,7 @@ self.client=connect(
     + 下载文件保存路径`download_dir=r"F:\study_project\webpack\scrapy\bilibili\bilibili\spiders"` 
     + 下载多少个`target_count=2` 
     + Chrome浏览器驱动路径`webdriver_path=r'F:\study_project\webpack\SeleniumDemo\chromedriver.exe'`
+    + 配置下载线程数：`MAX_THREAD=5`
 
 4. 切换到`../bilibili_scrapy/bilibili`目录下：
     + `scrapy crawl test01`
@@ -55,6 +56,7 @@ CREATE TABLE `bilibili_info` (
   `barrage` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `tags` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `classes` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `file_content` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=224 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

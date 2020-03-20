@@ -69,8 +69,9 @@ DOWNLOADER_MIDDLEWARES = {
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
    #'bilibili.pipelines.BilibiliPipeline': 300,
-   'bilibili.pipelines.MysqlPipeline':301,
-      'bilibili.pipelines.DownloadVideoPipeline':302,
+   
+   'bilibili.pipelines.DownloadVideoPipeline':301,
+   'bilibili.pipelines.MysqlPipeline':350,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
