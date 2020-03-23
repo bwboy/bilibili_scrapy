@@ -94,43 +94,30 @@ class DownloadVideoPipeline(object):
 
 
     def process_item(self, item, spider):
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36'
-        }
         '''
         res_aid=requests.get('https://api.bilibili.com/x/player/pagelist?bvid={BV14E411W7od}&jsonp=jsonp'.format(bvid))
         res_videolist-requests.get('https://api.bilibili.com/x/web-interface/view?cid=160387688&bvid=BV14E411W7od'.format())
         '''
-        bvid=item['href'].split('/')[-1]
 
-        res_cid=requests.get('https://api.bilibili.com/x/player/pagelist?bvid={}&jsonp=jsonp'.format(bvid),headers=headers).json()
-        cid_list=[]
-        for cid in res_cid['data']:
-            cid_list.append(cid['cid'])
-        cid=cid_list[0]
-
-        res_aid=requests.get('https://api.bilibili.com/x/web-interface/view?cid={}&bvid={}'.format(cid,bvid),headers=headers).json()
-        aid =res_aid['data']['aid']
-        item['aid']=aid
         self.download_path=spider.download_dir
-        start = str(item['aid'])
-        start_url = 'https://api.bilibili.com/x/web-interface/view?aid=' + str(item['aid'])
-        # if start.isdigit() == True:
-        #     # 如果输入的是av号
-        #     # 获取cid的api, 传入aid即可
-        #     aid = start
-        #     start_url = 'https://api.bilibili.com/x/web-interface/view?aid=' + aid
-        # else:
-        #     # 如果输入的是url (eg: https://www.bilibili.com/video/av46958874/)
-        #     aid = re.search(r'/av(\d+)/*', start).group(1)
-        #     start_url = 'https://api.bilibili.com/x/web-interface/view?aid=' + aid
+        start = item['aid']
+        if start.isdigit() == True:
+            # 如果输入的是av号
+            # 获取cid的api, 传入aid即可
+            aid = start
+            start_url = 'https://api.bilibili.com/x/web-interface/view?aid=' + aid
+        else:
+            # 如果输入的是url (eg: https://www.bilibili.com/video/av46958874/)
+            aid = re.search(r'/av(\d+)/*', start).group(1)
+            start_url = 'https://api.bilibili.com/x/web-interface/view?aid=' + aid
 
-        quality =spider.VIDEO_QUALITY    #input('请填写116或112或80或74或64或32或16:')
+        quality =spider.VIDEO_QUALITY #input('请填写116或112或80或74或64或32或16:')
 
-        
-        html = res_aid #requests.get(start_url, headers=headers).json()
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36'
+        }
+        html = requests.get(start_url, headers=headers).json()
         data = html['data']
-
         cid_list = []
         if '?p=' in start:
             # 单独下载分P视频中的一集

@@ -14,10 +14,11 @@ class Test01Spider(scrapy.Spider):
     name = 'test01'
     allowed_domains = ['bilibili.com']
     # start_urls = ['https://www.bilibili.com/ranking/']
-    target_count=5
+    target_count=3
     download_dir=r"F:\study_project\webpack\scrapy"
-    webdriver_path=r'F:\study_project\webpack\SeleniumDemo\chromedriver.exe'
-    MAX_THREAD=5
+    webdriver_path=r'F:\study_project\webpack\SeleniumDemo\chromedriver.exe' #selenium驱动位置
+    MAX_THREAD=5      #pipeline线程池
+    VIDEO_QUALITY=16  #pipeline视频质量16 32 64 80 -> 360p 480p 720p 1080p
 
     # 实例化一个浏览器对象
     def __init__(self):
@@ -29,6 +30,7 @@ class Test01Spider(scrapy.Spider):
         response = scrapy.Request(url,callback=self.parse)
         yield response
 
+    #解析排行版页面信息。
     def parse(self, response):
         ul=response.xpath('//li[@class="rank-item"]')
         video_meta=BilibiliItem()
@@ -52,7 +54,7 @@ class Test01Spider(scrapy.Spider):
             video_meta["img_url"]=img_url
             video_meta["name"]=name.strip()
             video_meta["href"]=href
-            video_meta["aid"]=re.search(r'/av(\d+)/*', href).group(1)
+            video_meta["aid"]='0'
 
             video_meta["view_counts"]=view_counts
             video_meta["review"]=review
@@ -60,6 +62,7 @@ class Test01Spider(scrapy.Spider):
             video_meta["score"]=score
             yield scrapy.Request(url=href,meta={'video_meta':deepcopy(video_meta)},callback=self.parse_detail)
 
+    #进入的详情页av1234567抓取信息。
     def parse_detail(self, response):
         video_meta=response.meta['video_meta']
 
