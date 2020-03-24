@@ -19,21 +19,38 @@ from twisted.internet import defer, threads
     负责返回浏览器渲染后的Response
 """
 class SeleniumInterceptMiddleware(object):
-    #通过chorme请求动态网页
+    #通过chrome请求动态网页
     def process_request(self, request, spider):
     	#这里的XXXX即为我们的爬虫名,对不同的爬虫进行动态的修改
+        print("---------url:{}-------------------".format(request.url))
         if spider.name == "test01":
             if not 'web-interface' in request.url and not  '.mp4' in request.url:
+                spider.browser.get(request.url)
+                spider.browser.add_cookie({'SESSDATA':'aa15d6af%2C1560734457%2Ccc8ca251'})
+                import time
+                if "ranking" in request.url:
+                    spider.browser.find_element_by_xpath('//ul[@class="rank-tab"]/li[{}]'.format(spider.TARGET_CLASS)).click()
+                time.sleep(4)
+                print('访问：{}'.format(request.url))
+                #这里直接retrun HtmlResponse的原因是我们已经通过模拟浏览器的方式访问过一遍网站了 不需要再次进入downloader下载一次所以直接return就好了
+                return HtmlResponse(url=spider.browser.current_url,body=spider.browser.page_source,encoding='utf-8')
+            else:
+                print("获取到了一个视频下载地址："+request.url)
+
+        if spider.name == "rankingspider":
+            if "ranking" in request.url:
                 spider.browser.get(request.url)
                 import time
                 if "ranking" in request.url:
                     spider.browser.find_element_by_xpath('//ul[@class="rank-tab"]/li[{}]'.format(spider.TARGET_CLASS)).click()
                 time.sleep(4)
-                print('访问：{0}'.format(request.url))
+                print('访问：{}'.format(request.url))
                 #这里直接retrun HtmlResponse的原因是我们已经通过模拟浏览器的方式访问过一遍网站了 不需要再次进入downloader下载一次所以直接return就好了
                 return HtmlResponse(url=spider.browser.current_url,body=spider.browser.page_source,encoding='utf-8')
-            else:
-                print("获取到了一个视频下载地址："+request.url)
+
+
+
+
 
 """ 
 @author:吴晓伟
@@ -46,8 +63,6 @@ class DownloadVideoMiddleware(object):
         if spider.name == "test01":
             if 'web-interface' in request.url:
                 pass
-
-
 
 class BilibiliSpiderMiddleware(object):
     # Not all methods need to be defined. If a method is not defined,

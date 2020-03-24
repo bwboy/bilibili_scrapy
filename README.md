@@ -5,6 +5,15 @@
 + `userspider.py`用户投稿全部爬取。
 + `forwordspider.py`收藏夹爬取。 
 
+
+## 文件`rankingspider.py`架构。
++ 简单说明，之后再详细说明。
+1. 请求交给`SeleniumInterceptMiddleware`，由selenium打开目标url，爬取排行榜信息。
+2. 此时浏览器挂机，`scrapy`爬取api接口获得视频`aid` `cid` `bid`和`metadata`。
+3. 将`VideoInfoItem`交给`RankingPipeline`，解析视频地址列表。
+4. 从视频列表向线程池提交下载任务。
+5. 爬虫结束后关闭selenium保存错误日志。 
+
 ## 文件`test01.py`架构。
 + 简单说明，之后再详细说明。
 1. 请求交给`SeleniumInterceptMiddleware`，由selenium打开目标，爬取排行榜信息。
@@ -144,6 +153,8 @@ CREATE TABLE `bilibili_info` (
   `tags` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `classes` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `file_content` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+      `avid` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cid` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=224 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

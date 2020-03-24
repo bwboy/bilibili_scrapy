@@ -23,6 +23,8 @@ class BilibiliPipeline(object):
         return item
 
 
+
+
 class MysqlPipeline(object):
     def open_spider(self,spider):
         self.client=connect(
@@ -84,6 +86,81 @@ class MysqlPipeline(object):
     def close_spider(self,spider):
         self.cursor.close()
         self.client.close()
+
+
+class RankingPipeline(object):
+    def open_spider(self,spider):
+        self.LOGGING=[]
+        self.threads_list=[]
+        self.executer=ThreadPoolExecutor(spider.MAX_THREAD)
+
+    def close_spider(self,spider):
+        wait(self.threads_list, return_when=ALL_COMPLETED)
+        self.executer.shutdown()
+        spider.LOGGING.append(self.LOGGING)
+
+    def process_item(self, item, spider):
+
+        for video_item in item['pages_list']:
+            item["pages"]=len(item['pages_list'])
+            item["cid"]=video_item['cid']
+            item["part"]=video_item['part']
+            self.process_detail(item, spider)
+        return item
+
+    def process_detail(self, item, spider):
+        headers={
+                'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:56.0) Gecko/20100101 Firefox/56.0',
+                'Accept': '*/*',
+                'Accept-Language': 'en-US,en;q=0.5',
+                'Accept-Encoding': 'gzip, deflate, br',
+                'Range': 'bytes=0-',  # Range 的值要为 bytes=0- 才能下载完整视频
+                'Referer': 'https://api.bilibili.com/x/web-interface/view?aid=' + str(item['avid']),  # 注意修改referer,必须要加的!
+                'Origin': 'https://www.bilibili.com',
+                'Connection': 'keep-alive',
+        }
+        detail_url='https://api.bilibili.com/x/player/playurl?cid={}&avid={}&qn={}'.format(item['cid'], item["avid"], spider.VIDEO_QUALITY)
+        jsonp=requests.get(url=detail_url,headers=headers).json()
+        video_list=[]
+        for video_item in jsonp['data']['durl']:
+            video_list.append(video_item['url'])
+        if not os.path.exists(os.path.join(spider.download_dir, 'bilibili_video', item['title'])):
+            os.mkdir(os.path.join(spider.download_dir, 'bilibili_video', item['title']))
+        item["file_content"]=str(os.path.join(spider.download_dir, 'bilibili_video', item['title']))
+        img_name=os.path.join(spider.download_dir, 'bilibili_video', item['title'],'{}'.format(item['img_url'].split('/')[-1]))
+        img=self.executer.submit(self.download_img,item["img_url"],img_name)
+        self.threads_list.append(img)
+
+        if item['pages']>1:
+            count=1
+            for video_url in video_list:
+                filename=os.path.join(spider.download_dir, 'bilibili_video', item['title'],'{}-{}.flv'.format(item['part'],count))
+                video_download=self.executer.submit(self.download_video,video_url, filename, headers=headers)
+                self.threads_list.append(video_download)
+                count+=1
+        else:
+            for video_url in video_list:
+                filename=os.path.join(spider.download_dir, 'bilibili_video', item['title'],'{}.flv'.format(item['title']))
+                video_download=self.executer.submit(self.download_video,video_url, filename, headers=headers)
+                self.threads_list.append(video_download)
+        
+
+    def download_img(self,img_url,filename):
+        response_img=requests.get(url=img_url,verify=False,stream=True)
+        with open(filename,'wb+') as f:
+            f.write(response_img.content)
+        print("【图片下载完成】：{}".format(filename))
+
+    def download_video(self,url,filename,headers):
+        print("【视频下载开始】：{}".format(url))
+        response_stream=requests.get(url=url,headers=headers,verify=False,stream=True)
+        f = open(filename,'wb+')
+        for chunk in response_stream.iter_content(chunk_size=10240):
+            if chunk:
+                f.write(chunk)
+        f.close()
+        self.LOGGING.append({"name":filename,"url":url})
+        print("【视频下载完成】：{}".format(filename))
 
 class DownloadVideoPipeline(object):
     
@@ -175,7 +252,6 @@ class DownloadVideoPipeline(object):
         return video_list
 
     def download_img(self,img_url,title):
-        print("-------------------开始下载图片{}-------------------------".format(title))
         currentVideoPath = os.path.join(self.download_path, 'bilibili_video', title)
         response_img=requests.get(url=img_url,verify=False,stream=True)
         filename=os.path.join(currentVideoPath, r'{}'.format(img_url.split('/')[-1]))

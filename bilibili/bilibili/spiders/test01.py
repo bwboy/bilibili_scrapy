@@ -5,9 +5,9 @@ from bilibili.items import BilibiliItem
 from copy import deepcopy
 from selenium import webdriver
 from  selenium.webdriver.chrome.options import Options    # 使用无头浏览器
-chorme_options = Options()
-chorme_options.add_argument("--headless")
-chorme_options.add_argument("--disable-gpu")
+chrome_options = Options()  #chrome
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--disable-gpu")
 
 '''
 爬取排行视频储存在本地。需要使用selenium打开每个页面。效率比较低，于是可以使用另一个。
@@ -31,12 +31,8 @@ class Test01Spider(scrapy.Spider):
             self.check_param()
         except expression as e:
             self.LOGGING.append(e)
-        self.browser = webdriver.Chrome(self.webdriver_path,chrome_options=chorme_options)
+        self.browser = webdriver.Chrome(self.webdriver_path,chrome_options=chrome_options)
         super().__init__()
-
-
-
-
 
     def start_requests(self):
         url ='https://www.bilibili.com/ranking/all/119/0/1' #"https://www.bilibili.com/ranking/"

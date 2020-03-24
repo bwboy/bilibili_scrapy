@@ -47,9 +47,9 @@ DEFAULT_REQUEST_HEADERS = {
 
 # Enable or disable spider middlewares
 # See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
-#SPIDER_MIDDLEWARES = {
-#    'bilibili.middlewares.BilibiliSpiderMiddleware': 543,
-#}
+SPIDER_MIDDLEWARES = {
+   #'bilibili.middlewares.BilibiliSpiderMiddleware': 543,
+}
 
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
@@ -57,8 +57,9 @@ DOWNLOADER_MIDDLEWARES = {
    #'bilibili.middlewares.BilibiliDownloaderMiddleware': 543,
    'bilibili.middlewares.SeleniumInterceptMiddleware': 1,
    
+   
 }
-
+# LOG_LEVEL ='WARNING'
 # Enable or disable extensions
 # See https://docs.scrapy.org/en/latest/topics/extensions.html
 #EXTENSIONS = {
@@ -70,8 +71,9 @@ DOWNLOADER_MIDDLEWARES = {
 ITEM_PIPELINES = {
    #'bilibili.pipelines.BilibiliPipeline': 300,
    
-   'bilibili.pipelines.DownloadVideoPipeline':301,
-   'bilibili.pipelines.MysqlPipeline':350,
+   # 'bilibili.pipelines.DownloadVideoPipeline':301,
+   'bilibili.pipelines.RankingPipeline':302,
+   # 'bilibili.pipelines.MysqlPipeline':350,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

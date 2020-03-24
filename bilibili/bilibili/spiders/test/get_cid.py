@@ -1,6 +1,6 @@
 import requests
 import ssl
-import re,os
+import re,os,json
 
 '''
 author:吴晓伟
@@ -102,10 +102,15 @@ def aaaa():
     with open(download_dir+'/90b6614d19ec063b643edf92682d3f55.mp3','wb+') as f:
         f.write(res.content)
 
+def jsontest():
+    a='{"code":0,"message":"0","ttl":1,"data":[{"cid":75096861,"page":1,"from":"vupload","part":"Red Alert 2情怀回顾！","duration":66,"vid":"","weblink":"","dimension":{"width":1600,"height":900,"rotate":0}}]}'
+    data=json.loads(a)
 
-
+    print(data['code'])
+    print(data['data'][0]['cid'])
 
 if __name__ == "__main__":
     ssl._create_default_https_context = ssl._create_unverified_context
-    get_cid()
+    #get_cid()
     #aaaa()
+    jsontest()
