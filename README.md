@@ -1,8 +1,44 @@
-@[TOC](Bilibili爬虫url分析) 2020 3 23
+@[TOC](Bilibili爬虫url分析) 
+# 项目总体说明 
++ `test01.py`第一个爬虫，用于手动爬取排行榜，性能比较低
++ `rankingspider.py` 爬取排行榜，只访问排行榜第一个页面，剩下数据全部由接口抓取。比上一个稍有提升。
++ `userspider.py`用户投稿全部爬取。
++ `forwordspider.py`收藏夹爬取。 
 
+## 文件`test01.py`架构。
++ 简单说明，之后再详细说明。
+1. 请求交给`SeleniumInterceptMiddleware`，由selenium打开目标，爬取排行榜信息。
+2. 再由selenium进入详情页，爬取详细信息。
+3. 将item交给`DownloadVideoPipeline`，爬取视频，生成路径和图片信息。
+4. 再将item交给`MysqlPipeline`，写入数据库。
+5. 爬虫结束后关闭selenium保存错误日志。
 
+# URL 分析 2020/3/23 
+**【重要】**:这天bilibili改了url规则，直接导致下面逻辑不可用。
++ 简介：由`bvid`获取`cid`，再由`cid`和`bvid`获取`aid`，再由`aid`和`cid`获取`视频流url`。
+## 1. 获取cid 
++
+	```python
+	res_cid=requests.get('https://api.bilibili.com/x/player/pagelist?bvid={}&jsonp=jsonp'.format(bvid),headers=headers_list).json()
+	cid_list=[]
+	for cid in res_cid['data']:
+	    cid_list.append(cid['cid'])
+	cid=cid_list[0]
+	```
+## 2. 通过cid - bvid 获取aid 
++	
+	```python
+	res_aid=requests.get('https://api.bilibili.com/x/web-interface/view?cid={}&bvid={}'.format(cid,bvid),headers=headers_list).json()
+	aid =res_aid['data']['aid']
+	```
+## 3. 通过 aid cid 获取视频列表文件 
++ 
+	```python
+	url_api = 'https://api.bilibili.com/x/player/playurl?cid={}&avid={}&qn={}'.format(cid, aid, quality)
+	```
++ **注意:** 若看不懂，请看下面在看上面。了解如何`演变`而来。
 
-# URL分析
+# URL分析 @Desprecated
 ## 1. 获取cid
 + 每个视频有av号，例如av12345678，我们需要拿出其中的`数字`。访问到如下地址，获取视频`cid`。这个url不仅可以获取cid并且能够获取`封面地址`、`title`和`视频分P`一些其他信息。`想要得到视频流地址，必须先获得视频cid`
 	```python

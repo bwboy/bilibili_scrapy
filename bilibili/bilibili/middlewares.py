@@ -26,6 +26,8 @@ class SeleniumInterceptMiddleware(object):
             if not 'web-interface' in request.url and not  '.mp4' in request.url:
                 spider.browser.get(request.url)
                 import time
+                if "ranking" in request.url:
+                    spider.browser.find_element_by_xpath('//ul[@class="rank-tab"]/li[{}]'.format(spider.TARGET_CLASS)).click()
                 time.sleep(4)
                 print('访问：{0}'.format(request.url))
                 #这里直接retrun HtmlResponse的原因是我们已经通过模拟浏览器的方式访问过一遍网站了 不需要再次进入downloader下载一次所以直接return就好了
