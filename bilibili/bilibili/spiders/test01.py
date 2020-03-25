@@ -32,6 +32,7 @@ class Test01Spider(scrapy.Spider):
         except expression as e:
             self.LOGGING.append(e)
         self.browser = webdriver.Chrome(self.webdriver_path,chrome_options=chrome_options)
+        self.browser.implicitly_wait(5)
         super().__init__()
 
     def start_requests(self):

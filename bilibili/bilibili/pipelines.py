@@ -12,7 +12,7 @@ import requests
 import threading
 from concurrent.futures import ThreadPoolExecutor, wait, ALL_COMPLETED, FIRST_COMPLETED
 
-import os, time, re
+import os, time, re,random
 # import random
 # import imageio, urllib.request, sys
 # from moviepy.editor import *
@@ -94,10 +94,22 @@ class RankingPipeline(object):
         self.threads_list=[]
         self.executer=ThreadPoolExecutor(spider.MAX_THREAD)
 
+        self.PROXIES_LIST=spider.PROXIES_LIST
+        self.DOWNLOAD_RETRY=[]
+
+        self.successCount=0
+
     def close_spider(self,spider):
-        wait(self.threads_list, return_when=ALL_COMPLETED)
         self.executer.shutdown()
         spider.LOGGING.append(self.LOGGING)
+        print("共有{}个文件下载失败。".format(len(self.DOWNLOAD_RETRY)))
+        print("共有{}个文件被下载。".format(self.successCount))
+        #错误报告导出
+        if len(self.LOGGING)!=0:
+            with open(spider.download_dir + 'failed_log.log', "w+") as f:
+                f.write(json.dumps(self.LOGGING))
+                f.close()
+            print("错误报告已经生成在:{}".format(spider.download_dir+r'\failed_log.log'))
 
     def process_item(self, item, spider):
 
@@ -106,6 +118,17 @@ class RankingPipeline(object):
             item["cid"]=video_item['cid']
             item["part"]=video_item['part']
             self.process_detail(item, spider)
+
+        wait(self.threads_list, return_when=ALL_COMPLETED)
+        if len(self.PROXIES_LIST)==0 and spider.EnableProxy==True:
+            self.LOGGING.append(self.DOWNLOAD_RETRY)
+            raise RuntimeError("没有可用的代理了。下载结束！")
+        for video in self.DOWNLOAD_RETRY:
+            video_download=self.executer.submit(self.download_video,video['url'], video['filename'],video['headers'])
+            self.threads_list.append(video_download)
+        wait(self.threads_list, return_when=ALL_COMPLETED)
+
+
         return item
 
     def process_detail(self, item, spider):
@@ -151,17 +174,36 @@ class RankingPipeline(object):
             f.write(response_img.content)
         print("【图片下载完成】：{}".format(filename))
 
+
     def download_video(self,url,filename,headers):
         print("【视频下载开始】：{}".format(url))
-        response_stream=requests.get(url=url,headers=headers,verify=False,stream=True)
+        proxy=None
+        response_stream=None
+        try:
+            proxy=random.choice(self.PROXIES_LIST)
+        except e:
+            print("没有获取代理")
+        if proxy!=None:
+            try:
+                response_stream=requests.get(url=url,headers=headers,verify=False,stream=True,proxies=proxy)
+            except e:
+                print("【代理出现错误：{}】".format(proxy))
+                print(e)
+                self.PROXIES_LIST.pop(proxy)
+                self.DOWNLOAD_RETRY.append({"url":url,"filename":filename,"headers":headers})
+        else:
+            response_stream=requests.get(url=url,headers=headers,verify=False,stream=True)
         f = open(filename,'wb+')
         for chunk in response_stream.iter_content(chunk_size=10240):
             if chunk:
                 f.write(chunk)
         f.close()
-        self.LOGGING.append({"name":filename,"url":url})
+        self.DOWNLOAD_RETRY.pop({"url":url,"filename":filename,"headers":headers})
+        self.successCount+=1
         print("【视频下载完成】：{}".format(filename))
+        return None
 
+    
 class DownloadVideoPipeline(object):
     
     def open_spider(self,spider):

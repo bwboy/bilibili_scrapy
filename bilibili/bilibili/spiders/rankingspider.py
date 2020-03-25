@@ -7,8 +7,8 @@ from copy import deepcopy
 import logging
 logger=logging.getLogger()
 chrome_options = Options()
-# chrome_options.add_argument("--headless")
-# chrome_options.add_argument("--disable-gpu")
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--disable-gpu")
 chrome_options.add_argument('User-Agent="Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36"')
 
 
@@ -22,8 +22,13 @@ class RankingspiderSpider(scrapy.Spider):
     target_count=4
     MAX_THREAD=5
     VIDEO_QUALITY=16  #pipeline视频质量16 32 64 80 -> 360p 480p 720p 1080p
-    TARGET_CLASS=3   #全站 动画 国创相关 音乐 舞蹈 游戏 科技 数码 生活 鬼畜 时尚 娱乐 影视
+    TARGET_CLASS=6   #全站 动画 国创相关 音乐 舞蹈 游戏 科技 数码 生活 鬼畜 时尚 娱乐 影视
     LOGGING=[]
+
+    PROXIES_LIST=[{"http":"117.94.213.117:8118"}] #[{"http":"127.0.0.1:8080"},{"http":"127.0.0.1:8080"},{"http":"127.0.0.1:8080"}]
+
+    EnableProxy=False
+
 
 
 
@@ -38,20 +43,17 @@ class RankingspiderSpider(scrapy.Spider):
         super().__init__()
 
     def start_requests(self):
-        url='https://www.bilibili.com/ranking/'
+        url=self.URL
 
         yield scrapy.Request(url,callback=self.parse)
 
     def parse(self, response):
         print("---------------------爬虫正式开始！--------------------------------")
         ul=response.xpath('//li[@class="rank-item"]')
-        print("----------------{}-------------------".format(1))
-        print("-----------UL长度-----{}-------------------".format(len(ul)))
         video_meta=VideoInfoItem()
-        print("----------------{}-------------------".format(2))
         counts=0
+        print("-------------------UL:---{}-------------------------------".format(len(ul)))
         for li in ul:
-            print("----------------{}-------------------".format(3))
             counts+=1
             if counts==self.target_count+1:
                 break
@@ -128,10 +130,6 @@ class RankingspiderSpider(scrapy.Spider):
     # 整个爬虫结束后关闭浏览器
     def close(self,spider):
         self.browser.quit()
-        if len(self.LOGGING)!=0:
-            print()
-            with open(self.download_dir + 'failed_log.log', "w+") as f:
-                f.write(json.dumps(self.LOGGING))
-                f.close()
-            print("错误报告已经生成在:{}".format(self.download_dir+r'\failed_log.log'))
+
         print("爬虫已关闭！")
+

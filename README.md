@@ -8,11 +8,14 @@
 
 ## 文件`rankingspider.py`架构。
 + 简单说明，之后再详细说明。
-1. 请求交给`SeleniumInterceptMiddleware`，由selenium打开目标url，爬取排行榜信息。
-2. 此时浏览器挂机，`scrapy`爬取api接口获得视频`aid` `cid` `bid`和`metadata`。
-3. 将`VideoInfoItem`交给`RankingPipeline`，解析视频地址列表。
-4. 从视频列表向线程池提交下载任务。
-5. 爬虫结束后关闭selenium保存错误日志。 
+1. 请求交给`ProxyHandlerMiddleware`自动获取代理，这个中间件可以关闭【注意开启后必须有代理，否则不会成功】
+2. 之后交给`SeleniumInterceptMiddleware`，由selenium打开目标url，爬取排行榜信息。
+3. 此时浏览器挂机，`scrapy`爬取api接口获得视频`aid` `cid` `bid`和`metadata`。
+4. 将`VideoInfoItem`交给`RankingPipeline`，解析视频地址列表。
+5. 从视频列表向`线程池`提交下载任务。
+7. 如果代理IP下载失败则放入`失败队列`，同时删除这个代理IP。
+8. 失败队列`重新选择代理`下载这个视频。
+6. 爬虫结束后关闭selenium保存错误日志、关闭任务队列。 
 
 ## 文件`test01.py`架构。
 + 简单说明，之后再详细说明。
