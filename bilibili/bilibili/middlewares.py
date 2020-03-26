@@ -11,8 +11,13 @@ from scrapy.http import HtmlResponse
 from twisted.internet import defer, threads
 import threading
 from concurrent.futures import ThreadPoolExecutor, wait, ALL_COMPLETED, FIRST_COMPLETED
+import queue,json,os
 # from tender_scrapy.extendsion.selenium.spider import SeleniumSpider
 # from tender_scrapy.extendsion.selenium.requests import SeleniumRequest
+
+access_list=queue.Queue()
+executor = ThreadPoolExecutor(max_workers=5)
+thread_list=[]
 
 """ 
 @author:吴晓伟
@@ -48,7 +53,14 @@ class SeleniumInterceptMiddleware(object):
                 print('访问：{}'.format(request.url))
                 return HtmlResponse(url=spider.browser.current_url,body=spider.browser.page_source,encoding='utf-8')
 
-
+        if 'space.bilibili.com' in  request.url:
+            spider.browser.get(request.url)
+            if "ranking" in request.url:
+                spider.browser.implicitly_wait(10)
+                spider.browser.find_element_by_xpath('//ul[@class="rank-tab"]/li[{}]'.format(spider.TARGET_CLASS)).click()
+            time.sleep(2)
+            print('访问：{}'.format(request.url))
+            return HtmlResponse(url=spider.browser.current_url,body=spider.browser.page_source,encoding='utf-8')
 
 
 class ProxyHandlerMiddleware(object):
@@ -56,19 +68,21 @@ class ProxyHandlerMiddleware(object):
             'Host': 'bilibili.com',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36'
         }
-    access_list=[]
-    executor = ThreadPoolExecutor(max_workers=5)
-    thread_list=[]
+
 
     def process_request(self, request, spider):
-        if spider.name == "rankingspider":
-            if "ranking" in request.url:
-                spider.EnableProxy=True
-                self.access_list=spider.PROXIES_LIST
+        if spider.name == "rankingspider" or spider.name == "userspider":
+            if "ranking" in request.url or "space.bilibili.com" in request.url:
+                [access_list.put(i) for i in spider.PROXIES_LIST]
                 self.getProxyList(spider)
-                if len(self.access_list)==0:
+                if access_list.qsize()==0:
                     raise RuntimeError('【警告】没有获取到代理地址，爬虫不会进行！[Warning] If the proxy address is not obtained, the crawler will not proceed!')
-                print("一共获取到代理个数：{}".format(len(self.access_list)))
+                
+                # 保存读取到的代理。
+                with open("proxy.txt","w+",encoding="utf-8") as f:
+                    f.write(str([access_list.get() for i in range(access_list.qsize())]))
+                
+                print("一共获取到代理个数：{}".format(access_list.qsize()))
         return None
 
 
@@ -79,8 +93,6 @@ class ProxyHandlerMiddleware(object):
         spider.browser.execute_script(js)
         tr = spider.browser.find_elements_by_xpath('//tr[@class="odd"]')
         time.sleep(4)
-
-
         current_list=[]
         i=1
         for td in tr:
@@ -96,12 +108,13 @@ class ProxyHandlerMiddleware(object):
                 break
         
         for li in current_list:
-            task = self.executor.submit(self.test_proxy,spider.URL,li,self.headers)
-            self.thread_list.append(task)
-        wait(self.thread_list, return_when=ALL_COMPLETED)
-        self.executor.shutdown()
-        print('{}个代理可以使用,一共检测到{}个代理。'.format(len(self.access_list),len(current_list)))
-        return self.access_list
+            task = executor.submit(self.test_proxy,"bilibili.com",li,self.headers)
+            thread_list.append(task)
+        wait(thread_list, return_when=ALL_COMPLETED)
+
+        executor.shutdown()
+        print('{}个代理可以使用,一共检测到{}个代理。'.format(access_list.qsize(),len(current_list)))
+        return access_list
 
     ''' 测试代理 '''
     def test_proxy(self,test_url,li,headers):
@@ -109,7 +122,7 @@ class ProxyHandlerMiddleware(object):
         proxy_temp={"http":li}
         try:
             res = requests.get(test_url,headers=headers,proxies=proxy_temp,verify=False,timeout=5)
-            self.access_list.append(proxy_temp)
+            access_list.put(proxy_temp)
         except Exception as e:
             print(li+"  is delete"+'-------')
     def process_response(self, request, response, spider):

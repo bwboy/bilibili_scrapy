@@ -37,74 +37,48 @@ class MysqlPipeline(object):
         self.cursor=self.client.cursor()
 
     def process_item(self, item, spider):
-        if spider.name!="userspider":
-            args=[
-                item["name"],
-                int(item["rank"]),
-                item["img_url"],
-                item["href"],
-                item["view_counts"],
-                item["review"],
-                item["author"],
-                int(item["score"])
-            ]
-            args2=[
-                # int(item["aid"]),
-                item["name"],
-                int(item["rank"]),
-                item["img_url"],
-                item["href"],
-                item["view_counts"],
-                item["review"],
-                item["author"],
-                int(item["score"]),
+        if spider.name!='test01':   #爬虫名字不等于这个直接跳过。不同爬虫有不同逻辑。
+            return item
+        args=[
+            item["name"],
+            int(item["rank"]),
+            item["img_url"],
+            item["href"],
+            item["view_counts"],
+            item["review"],
+            item["author"],
+            int(item["score"])
+        ]
+        args2=[
+            # int(item["aid"]),
+            item["name"],
+            int(item["rank"]),
+            item["img_url"],
+            item["href"],
+            item["view_counts"],
+            item["review"],
+            item["author"],
+            int(item["score"]),
 
-                item["pub_time"],
-                item["like"],
-                item["coins"],
-                item["favorite"],
-                item["forward"],
-                item["barrage"],
-                str(item["tags"]),
-                item["classes"],
-                item["file_content"],
-                item["avid"],
-                item["cid"],
-            ]
-            # sql='insert into bilibili_rank VALUES(0,%s,%s,%s,%s,%s,%s,%s,%s)'
-            sql2='insert into bilibili_info VALUES(0,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'
-            # self.cursor.execute(sql,args)
-            self.cursor.execute(sql2,args2)
-        else:
-            args2=[
-                # int(item["aid"]),
-                item["title"],
-                int(0),
-                item["img_url"],
-                "---",
-                item["view"],
-                item["reply"],
-                item["author"],
-                int(0),
+            item["pub_time"],
+            item["like"],
+            item["coins"],
+            item["favorite"],
+            item["forward"],
+            item["barrage"],
+            str(item["tags"]),
+            item["classes"],
+            item["file_content"],
+            item["avid"],
+            item["cid"],
+        ]
 
-                item["pub_time"],
-                item["like"],
-                item["coins"],
-                item["favorite"],
-                item["forward"],
-                item["barrage"],
-                str(item["tags"]),
-                item["classes"],
-                item["file_content"],
-                item["avid"],
-                item["cid"],
-            ]
 
-            sql2='insert into bilibili_info VALUES(0,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'
-            self.cursor.execute(sql2,args2)
+        sql='insert into bilibili_rank VALUES(0,%s,%s,%s,%s,%s,%s,%s,%s)'
 
-        
-
+        sql2='insert into bilibili_info VALUES(0,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'
+        self.cursor.execute(sql,args)
+        self.cursor.execute(sql2,args2)
         self.client.commit()
         return item
 
@@ -132,12 +106,7 @@ class RankingPipeline(object):
         print(e)
 
     def close_spider(self,spider):
-
-        wait(self.threads_list, return_when=ALL_COMPLETED)
-        if len(self.PROXIES_LIST)==0 and spider.EnableProxy==True:
-            [self.LOGGING.put(i) for i in self.DOWNLOAD_RETRY]
-            raise RuntimeError("没有可用的代理了。下载结束！")
-
+        print(self.PROXIES_LIST)
         self.executer.shutdown()
         print("共有{}个文件下载失败。".format(len(self.DOWNLOAD_RETRY)))
         print("共有{}个文件被下载。".format(self.SUCCESS_QUEUE.qsize()))
@@ -171,7 +140,6 @@ class RankingPipeline(object):
         img=self.executer.submit(self.download_img,item["img_url"],img_name)
         self.threads_list.append(img)
 
-
         if item['pages']>1:
             count=1
             for video_url in video_list:
@@ -184,6 +152,16 @@ class RankingPipeline(object):
                 filename=os.path.join(spider.download_dir, 'bilibili_video', item['title'],'{}.flv'.format(item['title']))
                 video_download=self.executer.submit(self.download_video,video_url, filename, headers=headers)
                 self.threads_list.append(video_download)
+        # 错误重试：
+        wait(self.threads_list, return_when=ALL_COMPLETED)
+        if len(self.PROXIES_LIST)==0 and spider.EnableProxy==True:
+            [self.LOGGING.put(i) for i in self.DOWNLOAD_RETRY]
+            raise RuntimeError("没有可用的代理了。下载结束！")
+        for video in self.DOWNLOAD_RETRY:
+            video_download=self.executer.submit(self.download_video,video['url'], video['filename'],video['headers'])
+            self.threads_list.append(video_download)
+        wait(self.threads_list, return_when=ALL_COMPLETED)
+        
         return item
                 
         
@@ -196,46 +174,38 @@ class RankingPipeline(object):
 
 
     def download_video(self,url,filename,headers):
+        print("【视频下载开始】：{}".format(url))
+        # self.SUCCESS_QUEUE.put({"url":url,"filename":filename,"headers":headers})
+
+        try:
+            proxy=None
+            response_stream=None
+            try:
+                proxy=random.choice(self.PROXIES_LIST)
+            except e:
+                print("没有获取代理")
+            if proxy!=None:
+                try:
+                    response_stream=requests.get(url=url,headers=headers,verify=False,stream=True,proxies=proxy)
+                except e:
+                    print("【代理出现错误：{}】".format(proxy))
+                    print(e)
+                    self.PROXIES_LIST.pop(proxy)
+                    self.DOWNLOAD_RETRY.append({"url":url,"filename":filename,"headers":headers})
+            else:
+                response_stream=requests.get(url=url,headers=headers,verify=False,stream=True)
+            f = open(filename,'wb+')
+            for chunk in response_stream.iter_content(chunk_size=10240):
+                if chunk:
+                    f.write(chunk)
+            f.close()
+            self.DOWNLOAD_RETRY.pop({"url":url,"filename":filename,"headers":headers})
+        except expression as e:
+            print(e)
+            raise RuntimeError("出错啦")
+            
+
         
-        self.SUCCESS_QUEUE.put({"url":url,"filename":filename,"headers":headers})
-        proxy=None
-        response_stream=None
-        if len(self.PROXIES_LIST)!=0:
-            proxy=random.choice(self.PROXIES_LIST)
-        if proxy!=None:
-            response_stream=requests.get(url=url,headers=headers,verify=False,stream=True,proxies=proxy)
-            if response_stream.status_code!=200:
-                print("【代理出现错误：{}】".format(proxy))
-                self.download_retry(filename,url,headers)
-        else:
-            response_stream=requests.get(url=url,headers=headers,verify=False,stream=True)
-
-
-        print("【视频下载开始】：{}---proxy:{}".format(filename,proxy))
-        f = open(filename,'wb+')
-        for chunk in response_stream.iter_content(chunk_size=10240):
-            if chunk:
-                f.write(chunk)
-        f.close()
-        
-    def download_retry(self,filename,url,headers):
-        count=0
-        while True:
-            response_stream=requests.get(url=url,headers=headers,verify=False,stream=True,proxies=random.choice(self.PROXIES_LIST))
-            if response_stream.status_code==200:
-                print("【重试成功，下载开始】：{}---proxy:{}".format(filename,proxy))
-                f = open(filename,'wb+')
-                for chunk in response_stream.iter_content(chunk_size=10240):
-                    if chunk:
-                        f.write(chunk)
-                f.close()
-                break
-            count+=1
-            if count==5:
-                print("【重试失败】：{}".format(filename))
-                break
-
-
         
 
 '''test01专用pipeline，没事别用'''
@@ -300,7 +270,7 @@ class DownloadVideoPipeline(object):
                     video_download=self.executer.submit(self.download_video,video_list, title, start_url, page)
                     item["file_content"]=str(os.path.join(self.download_path, 'bilibili_video', title))
                     self.threads_list.append(video_download)
-                except:
+                except expression as e:
                     self.LOGGING.put(e)
                     self.LOGGING.put({
                         'title':title,

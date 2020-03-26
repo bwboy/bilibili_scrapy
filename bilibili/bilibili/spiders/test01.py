@@ -4,6 +4,7 @@ import re
 from bilibili.items import BilibiliItem
 from copy import deepcopy
 from selenium import webdriver
+from bilibili import settings
 from  selenium.webdriver.chrome.options import Options    # 使用无头浏览器
 chrome_options = Options()  #chrome
 chrome_options.add_argument("--headless")
@@ -145,6 +146,6 @@ class Test01Spider(scrapy.Spider):
                 print("您选择了{}".format(self.VIDEO_QUALITY))
         if(i44!=''):
             i4=int(i44)
-            if( i4<=13):
+            if( i4<=13 and i4>=1):
                 self.TARGET_CLASS=i4
                 print("您选择了{}".format(self.TARGET_CLASS))

@@ -14,7 +14,13 @@ BOT_NAME = 'bilibili'
 SPIDER_MODULES = ['bilibili.spiders']
 NEWSPIDER_MODULE = 'bilibili.spiders'
 
+DOWNLOAD_DIR=r"F:\study_project\webpack\scrapy"
+WEBDRIVER_PATH=r'F:\study_project\webpack\SeleniumDemo\chromedriver.exe'
 
+def getDownloadDir():
+   return DOWNLOAD_DIR
+def getWebDriverPath():
+   return WEBDRIVER_PATH
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'bilibili (+http://www.yourdomain.com)'
 
@@ -57,8 +63,6 @@ DOWNLOADER_MIDDLEWARES = {
    #'bilibili.middlewares.BilibiliDownloaderMiddleware': 543,
    # 'bilibili.middlewares.ProxyHandlerMiddleware': 1,
    'bilibili.middlewares.SeleniumInterceptMiddleware': 2,
-   
-   
 }
 # LOG_LEVEL ='WARNING'
 # Enable or disable extensions
@@ -71,10 +75,11 @@ DOWNLOADER_MIDDLEWARES = {
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
    #'bilibili.pipelines.BilibiliPipeline': 300,
-   
    # 'bilibili.pipelines.DownloadVideoPipeline':301,
    'bilibili.pipelines.RankingPipeline':302,
-   # 'bilibili.pipelines.MysqlPipeline':350,
+   'bilibili.pipelines.MysqlPipeline':350,
+   # 'bilibili.pipelines.MongoPipeline':352,
+   
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

@@ -68,15 +68,15 @@ def get_cid():
     print('|----开始下载"{}"作者的视频"{}"'.format(author,video_title))
 
     
-    # for video_url in video_list:
-    #     response_stream=requests.get(url=video_url,headers=header_download,stream=True)
+    for video_url in video_list:
+        response_stream=requests.get(url=video_url,headers=header_download,stream=True)
 
-    #     if not os.path.exists(download_dir+'/{}'.format(video_title)):
-    #         os.mkdir(download_dir+'/{}'.format(video_title))
-    #     download_img(img_pic,download_dir,video_title)
-    #     download_video(video_url,header_download,download_dir,video_title)
-    #     with open("{}/{}/{}.mp4".format(download_dir,video_title,video_title),'wb+') as f:
-    #         f.write(response_stream.content)
+        if not os.path.exists(download_dir+'/{}'.format(video_title)):
+            os.mkdir(download_dir+'/{}'.format(video_title))
+        download_img(img_pic,download_dir,video_title)
+        download_video(video_url,header_download,download_dir,video_title)
+        with open("{}/{}/{}.mp4".format(download_dir,video_title,video_title),'wb+') as f:
+            f.write(response_stream.content)
   
 
     print("下载完成：{}".format(video_title))
