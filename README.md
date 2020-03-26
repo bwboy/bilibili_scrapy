@@ -10,7 +10,7 @@ bilibili视频爬取工具。支持`线程池`、`Mysql`、`Mongo`、`设置代�
 1. 克隆或拉取项目后，请安装依赖模块： 
 `pip install -r requirements.txt`
 
-2. 设置下载目录，打开"`bilibili_scrapy/bilibili/bilibili/setting.py`"
+2. 设置下载目录，打开"`bilibili_scrapy/bilibili/bilibili/settings.py`"
 	```python
 	# 下载目录
 	DOWNLOAD_DIR=r"F:\study_project\webpack\scrapy"
@@ -46,7 +46,7 @@ bilibili视频爬取工具。支持`线程池`、`Mysql`、`Mongo`、`设置代�
 	    PROXIES_LIST=[] #代理格式：[{"http":"117.94.213.117:8118"},{"http":"127.0.0.1:8080"},{"http":"127.0.0.1:8080"},{"http":"127.0.0.1:8080"}]
 	```
 + 爬取用户投稿。
-1. 确定配置了chrome的驱动程序，上文`setting.py`提到。
+1. 确定配置了chrome的驱动程序，上文`settings.py`提到。
 2. `userId`填写空间地址，或者用户id。注意当`userId`有值时，不在爬取`start_urls`里的内容。
 3. 设置一下爬取数量和线程。因为有些用户投稿的视频，很多。。
 4. 仍然执行`scrapy crawl userspider`
@@ -94,26 +94,26 @@ scrapy crawl rankingspider
 ## 其他插件
 + 在 unittest目录中有个文件`proxytest.py`可以用来爬取可用代理。和一些单元测试，和项目无关。
 
-## 目录结构
-|-- undefined 
-    |-- datereport.md 
-    |-- README.md			说明 
-    |-- requirements.txt	依赖 
-    |-- acfun				acfun爬虫测试 
-    |-- bilibili			bilibili爬虫项目 
-        |-- scrapy.cfg		scrapy配置文件 
-        |-- bilibili		bilibili爬虫目录 
-            |-- items.py	爬取视频的元信息metadata 
-            |-- middlewares.py		中间件配置 
-            |-- pipelines.py		管道 
-            |-- settings.py			爬虫配置 
-            |-- __init__.py 
-            |-- spiders				爬虫实例目录 
-            |   |-- rankingspider.py 排行榜爬虫实例
-            |   |-- test01.py 
-            |   |-- userspider.py 		用户和自定义爬虫实例
-            |   |-- __init__.py 
-            |   |-- unittest		单元测试相关文件
+## 目录结构  
++ |-- bilibili_scrapy   
+    |-- datereport.md   
+    |-- README.md			说明  
+    |-- requirements.txt	依赖  
+    |-- acfun				acfun爬虫测试  
+    |-- bilibili			bilibili爬虫项目  
+        |-- scrapy.cfg		scrapy配置文件  
+        |-- bilibili		bilibili爬虫目录  
+            |-- items.py	爬取视频的元信息metadata  
+            |-- middlewares.py		中间件配置  
+            |-- pipelines.py		管道  
+            |-- settings.py			爬虫配置  
+            |-- __init__.py   
+            |-- spiders				爬虫实例目录  
+            |   |-- rankingspider.py 排行榜爬虫实例  
+            |   |-- test01.py  
+            |   |-- userspider.py 		用户和自定义爬虫实例 
+            |   |-- __init__.py   
+            |   |-- unittest		单元测试相关文件   
 ## 文件`rankingspider.py`架构。
 + 简单说明，之后再详细说明。
 1. 请求交给`ProxyHandlerMiddleware`自动获取代理，这个中间件可以关闭【注意开启后必须有代理，否则不会成功】
