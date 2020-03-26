@@ -13,6 +13,7 @@ import threading
 from concurrent.futures import ThreadPoolExecutor, wait, ALL_COMPLETED, FIRST_COMPLETED
 import os, time, re,random
 import queue
+from bilibili.settings import getMySQLConfig,getMongoConfig
 
 # import random
 # import imageio, urllib.request, sys
@@ -28,11 +29,11 @@ class BilibiliPipeline(object):
 class MysqlPipeline(object):
     def open_spider(self,spider):
         self.client=connect(
-            host='127.0.0.1',
-            port=3306,
-            user='wxwmodder',
-            password='sxmc321',
-            db='scrapy01'
+            host=getMySQLConfig()['host'],
+            port=getMySQLConfig()['port'],
+            user=getMySQLConfig()['user'],
+            password=getMySQLConfig()['password'],
+            db=getMySQLConfig()['db']
         )
         self.cursor=self.client.cursor()
 
@@ -171,7 +172,6 @@ class RankingPipeline(object):
         img=self.executer.submit(self.download_img,item["img_url"],img_name)
         self.threads_list.append(img)
 
-
         if item['pages']>1:
             count=1
             for video_url in video_list:
@@ -185,15 +185,12 @@ class RankingPipeline(object):
                 video_download=self.executer.submit(self.download_video,video_url, filename, headers=headers)
                 self.threads_list.append(video_download)
         return item
-                
-        
 
     def download_img(self,img_url,filename):
         response_img=requests.get(url=img_url,verify=False,stream=True)
         with open(filename,'wb+') as f:
             f.write(response_img.content)
         print("【图片下载完成】：{}".format(filename))
-
 
     def download_video(self,url,filename,headers):
         
@@ -209,8 +206,6 @@ class RankingPipeline(object):
                 self.download_retry(filename,url,headers)
         else:
             response_stream=requests.get(url=url,headers=headers,verify=False,stream=True)
-
-
         print("【视频下载开始】：{}---proxy:{}".format(filename,proxy))
         f = open(filename,'wb+')
         for chunk in response_stream.iter_content(chunk_size=10240):
@@ -368,7 +363,7 @@ class DownloadVideoPipeline(object):
 ''' 开启将数据储存到mongo '''
 class MongoPipeline(object):
     def open_spider(self,spider):
-        url = 'mongodb://root:root@127.0.0.1:27017/admin'
+        url = getMongoConfig()
         self.client=MongoClient(url)
 
     def process_item(self, item, spider):

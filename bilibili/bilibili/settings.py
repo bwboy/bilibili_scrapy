@@ -14,9 +14,22 @@ BOT_NAME = 'bilibili'
 SPIDER_MODULES = ['bilibili.spiders']
 NEWSPIDER_MODULE = 'bilibili.spiders'
 
+#下载地址
 DOWNLOAD_DIR=r"F:\study_project\webpack\scrapy"
+#chrome驱动地址
 WEBDRIVER_PATH=r'F:\study_project\webpack\SeleniumDemo\chromedriver.exe'
-
+#mysql配置
+MYSQL_CONFIG={"host":'127.0.0.1',
+            "port":3306,
+            "user":'wxwmodder',
+            "password":'sxmc321',
+            "db":'scrapy01'}
+#Mongo配置
+MONGO_CONFIG='mongodb://root:root@127.0.0.1:27017/admin'
+def getMongoConfig():
+    return MONGO_CONFIG
+def getMySQLConfig():
+    return MYSQL_CONFIG
 def getDownloadDir():
    return DOWNLOAD_DIR
 def getWebDriverPath():
@@ -77,9 +90,8 @@ ITEM_PIPELINES = {
    #'bilibili.pipelines.BilibiliPipeline': 300,
    # 'bilibili.pipelines.DownloadVideoPipeline':301,
    'bilibili.pipelines.RankingPipeline':302,
-   'bilibili.pipelines.MysqlPipeline':350,
+   # 'bilibili.pipelines.MysqlPipeline':350,
    # 'bilibili.pipelines.MongoPipeline':352,
-   
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
