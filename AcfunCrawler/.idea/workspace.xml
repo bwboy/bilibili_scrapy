@@ -18,7 +18,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pom.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="273">
+            <state relative-caret-position="337">
               <caret line="31" selection-start-line="31" selection-end-line="31" />
             </state>
           </provider>
@@ -27,11 +27,11 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/basic/MyCrawler.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="220">
-              <caret line="15" column="30" lean-forward="true" selection-start-line="15" selection-start-column="30" selection-end-line="15" selection-end-column="30" />
+            <state relative-caret-position="372">
+              <caret line="49" column="9" lean-forward="true" selection-start-line="49" selection-start-column="9" selection-end-line="49" selection-end-column="9" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#665#673#0" expanded="true" />
+                <element signature="e#857#865#0" expanded="true" />
                 <element signature="e#1104#1112#0" expanded="true" />
                 <element signature="e#2177#2185#0" expanded="true" />
                 <element signature="e#2478#2689#0" expanded="true" />
@@ -130,8 +130,8 @@
         <option value="$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/basic/BasicCrawler.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/entity/VideoInfo.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/utils/ParsePageUtil.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/basic/MyCrawler.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/utils/FileUrlDownloadUtil.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/basic/MyCrawler.java" />
       </list>
     </option>
   </component>
@@ -323,12 +323,12 @@
       <option name="presentableId" value="Default" />
       <updated>1585488802441</updated>
       <workItem from="1585488805157" duration="2961000" />
-      <workItem from="1585493466038" duration="28545000" />
+      <workItem from="1585493466038" duration="29670000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="31506000" />
+    <option name="totallyTimeSpent" value="32631000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
@@ -373,19 +373,19 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/basic/MyCrawler.java</url>
-          <line>85</line>
+          <line>87</line>
           <properties />
           <option name="timeStamp" value="11" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/basic/MyCrawler.java</url>
-          <line>75</line>
+          <line>76</line>
           <properties />
           <option name="timeStamp" value="12" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/basic/MyCrawler.java</url>
-          <line>94</line>
+          <line>97</line>
           <properties />
           <option name="timeStamp" value="13" />
         </line-breakpoint>
@@ -454,13 +454,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pom.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="273">
-          <caret line="31" selection-start-line="31" selection-end-line="31" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://C:/Program Files/Java/jdk1.8.0_171/src.zip!/java/io/FileSystem.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="138">
@@ -501,6 +494,24 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/utils/ParsePageUtil.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2323">
+          <caret line="23" column="5" lean-forward="true" selection-start-line="23" selection-start-column="5" selection-end-line="23" selection-end-column="5" />
+          <folding>
+            <element signature="method#main#0;class#ParsePageUtil#0" />
+            <element signature="e#986#994#0" expanded="true" />
+            <element signature="e#1794#2083#0" expanded="true" />
+            <element signature="e#2082#2083#0" expanded="true" />
+            <element signature="e#2618#2768#0" expanded="true" />
+            <element signature="e#2767#2768#0" expanded="true" />
+            <element signature="e#700#708#0" expanded="true" />
+            <element signature="e#2244#2252#0" expanded="true" />
+            <element signature="e#4637#4649#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/utils/HttpRequest.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="244">
@@ -523,21 +534,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/utils/ParsePageUtil.java">
+    <entry file="file://$PROJECT_DIR$/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2323">
-          <caret line="23" column="5" lean-forward="true" selection-start-line="23" selection-start-column="5" selection-end-line="23" selection-end-column="5" />
-          <folding>
-            <element signature="method#main#0;class#ParsePageUtil#0" />
-            <element signature="e#986#994#0" expanded="true" />
-            <element signature="e#1794#2083#0" expanded="true" />
-            <element signature="e#2082#2083#0" expanded="true" />
-            <element signature="e#2618#2768#0" expanded="true" />
-            <element signature="e#2767#2768#0" expanded="true" />
-            <element signature="e#700#708#0" expanded="true" />
-            <element signature="e#2244#2252#0" expanded="true" />
-            <element signature="e#4637#4649#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="337">
+          <caret line="31" selection-start-line="31" selection-end-line="31" />
         </state>
       </provider>
     </entry>
@@ -553,11 +553,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/basic/MyCrawler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="220">
-          <caret line="15" column="30" lean-forward="true" selection-start-line="15" selection-start-column="30" selection-end-line="15" selection-end-column="30" />
+        <state relative-caret-position="372">
+          <caret line="49" column="9" lean-forward="true" selection-start-line="49" selection-start-column="9" selection-end-line="49" selection-end-column="9" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#665#673#0" expanded="true" />
+            <element signature="e#857#865#0" expanded="true" />
             <element signature="e#1104#1112#0" expanded="true" />
             <element signature="e#2177#2185#0" expanded="true" />
             <element signature="e#2478#2689#0" expanded="true" />

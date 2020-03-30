@@ -23,6 +23,8 @@ public class MyCrawler {
     public static void main(String[] args) {
         String downloadDir="F:/study_project/webpack/scrapy/acfun_video/";  //注意一定加上/
 
+        Integer VIDEO_QUALITY =0; //0是最高.3是最低。
+
         /**
          * @Varb urls 是一个acid(https://www.acfun.cn/v/ac14297460)的列表集合。
          * 可以从排行榜获取，也可以手动添加。下面有演示。
@@ -41,7 +43,7 @@ public class MyCrawler {
 
         List<Thread> tasks = new LinkedList<Thread>();
         for (String url : urls) {
-            CrawlerThread thread = new CrawlerThread(url,downloadDir);
+            CrawlerThread thread = new CrawlerThread(url,downloadDir,VIDEO_QUALITY);
             Thread thread1 = new Thread(thread);
             thread1.start();
             tasks.add(thread1);
@@ -61,29 +63,30 @@ public class MyCrawler {
 
 
 class CrawlerThread implements Runnable {
-
     String URL;
     String downloadDir;
+    int VIDEO_QUALITY;
 
-    CrawlerThread(String url,String downloadDir) {
+    CrawlerThread(String url,String downloadDir,int VIDEO_QUALITY) {
         this.URL = url;
         this.downloadDir=downloadDir;
+        this.VIDEO_QUALITY=VIDEO_QUALITY;
     }
-
     @SneakyThrows
     public void run() {
-
         VideoInfo video = ParsePageUtil.getFileDownloadUrls(URL);
-
         final File file = new File(downloadDir + video.title.replaceAll("[\\pP\\p{Punct}]", ""));
         if (!file.exists()) {
             file.mkdir();
-
         }
 
+        //清晰度获取,目标视频清晰度可能不存在。于是降级。
+        String url=video.getUrls().get(VIDEO_QUALITY);
+        while (url==null){
+            url=video.getUrls().get(VIDEO_QUALITY-1);
+        }
+        String res = HttpRequest.sendGet(url);
 
-
-        String res = HttpRequest.sendGet(video.getUrls().get(3));
         String[] text = res.split(",");
         List<Thread> tasks = new LinkedList<Thread>();
         for (int i = 1; i < text.length; i++) {
