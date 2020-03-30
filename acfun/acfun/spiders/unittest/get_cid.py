@@ -29,7 +29,7 @@ def download_video(video_url,header_download,download_dir,video_title):
 
 download_header={
     "Origin": "https://www.acfun.cn",
-"Referer": "https://www.acfun.cn/v/ac14135772",
+"Referer": "https://www.acfun.cn/v/ac14297460",
 "Sec-Fetch-Mode": "cors",
 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36"
 }
@@ -40,13 +40,20 @@ def getVideoList():
     headers = {"User-Agent":"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36"}
     cookie='_did=web_587276529C71F009; uuid=5761bae80e67081a44e1237dd6b4610a; analytics=GA1.2.322245661.1584677218; ac__avi=1010874449232f551a0a15edb1a4042660b6a2365c641059371cf6c2c6febafe3a364146315ef65213; session_id=8151145309CA9EDE; Hm_lvt_2af69bc2b378fb58ae04ed2a04257ed1=1584677211,1585098768; analytics_gid=GA1.2.1325401876.1585098769; csrfToken=x6A3sEmzYUy5DSog38qERY3y; safety_id=AAKKUhcwT1IltFdY-__D7FH0; webp_supported=%7B%22lossy%22%3Atrue%2C%22lossless%22%3Atrue%2C%22alpha%22%3Atrue%2C%22animation%22%3Atrue%7D; lsv_js_player_v2_main=a91b93; cur_req_id=9361888160117998_self_f02ce542ccbe97bb7865d7eb8089dc0f; cur_group_id=9361888160117998_self_f02ce542ccbe97bb7865d7eb8089dc0f_0; lsv_js_player_v1_main=f2c6e6; Hm_lpvt_2af69bc2b378fb58ae04ed2a04257ed1=1585110433'
     cookie_dict = {i.split("=")[0]:i.split("=")[-1] for i in cookie.split("; ")}
-    url='https://www.acfun.cn/v/ac14135772'
+    url='https://www.acfun.cn/v/ac14297460'
     response=requests.get(url,cookies=cookie_dict,headers=headers)
     josnp=response.text
 
+
     s=josnp.find("window.videoInfo =",0)
     e=josnp.find("window.qualityConfig",0)
-    s1=josnp.find(";",s,e)
+    s1=josnp.rfind(";",s,e+5)
+    print("{}-{}-{}".format(s,e,s1))
+
+
+    with open('F:/study_project/webpack/scrapy/acfun_video/a.txt','w+',encoding='utf-8') as f:
+        f.write(josnp[s+len("window.videoInfo ="):s1])
+
     data=json.loads(josnp[s+len("window.videoInfo ="):s1])
     jsonstr=data['currentVideoInfo']['ksPlayJson']
     video_info_list=json.loads(jsonstr)['adaptationSet']['representation']
@@ -75,7 +82,9 @@ def download_split(filepath,filename):
     count=0
     for item in ITEMS:
         api='https://tx-safety-video.acfun.cn/mediacloud/acfun/acfun_video/segment/'+item.split('#')[0].strip()
-        download_video2('F:/study_project/webpack/scrapy/acfun_video/{}-{}.ts'.format(filename,count),api,download_header)
+        if not os.path.exists("F:/study_project/webpack/scrapy/acfun_video/{}".format(filename)):
+            os.mkdir("F:/study_project/webpack/scrapy/acfun_video/{}".format(filename))
+        download_video2('F:/study_project/webpack/scrapy/acfun_video/{0}/{1:04d}.ts'.format(filename,count),api,download_header)
         print("下载地址："+api)
         # print("下载完成！{}".format('F:/study_project/webpack/scrapy/acfun_video/{}-{}.m3u'.format(filename,count)))
         count+=1

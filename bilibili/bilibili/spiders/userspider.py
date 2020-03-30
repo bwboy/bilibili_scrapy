@@ -5,34 +5,39 @@ from bilibili.items import UserVideoInfoItem
 from copy import deepcopy
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options    # 使用无头浏览器
-
 from bilibili import settings
+
+#初始化全局配置。
 chrome_options = Options()
 chrome_options.add_argument("--headless")
 chrome_options.add_argument("--disable-gpu")
 chrome_options.add_argument('User-Agent="Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36"')
-
 logger=logging.getLogger()
 
 
 class UserspiderSpider(scrapy.Spider):
     name = 'userspider'
     allowed_domains = ['bilibili.com']
-    # 下载视频列表。有多少个都放进去。
-    start_urls = ['https://www.bilibili.com/video/BV1ob411p7oc']
-    # start_urls = ['https://www.bilibili.com/video/BV1d7411m78N',
-    # 'https://www.bilibili.com/video/BV1kE411P7gx',
-    # 'https://www.bilibili.com/video/BV1PE411W78K',
-    # 'https://www.bilibili.com/video/BV1k7411T7RH']
     download_dir=settings.getDownloadDir()
     webdriver_path=settings.getWebDriverPath()
+
+    # 用户参数 
+    # 下载视频列表。有多少个都放进去。
+    start_urls = ['https://www.bilibili.com/video/BV1ob411p7oc']
+    '''
+    start_urls = ['https://www.bilibili.com/video/BV1d7411m78N',
+    'https://www.bilibili.com/video/BV1kE411P7gx',
+    'https://www.bilibili.com/video/BV1PE411W78K',
+    'https://www.bilibili.com/video/BV1k7411T7RH']
+    '''
     MAX_THREAD=5
-    # 填写b站用户空间或用户id，爬取他的全部视频,不开启请填写None。target_count是爬取个数,默认4个。填写这里之后不再执行start_urls里内容。
-    userId=None#'https://space.bilibili.com/883968/video' #None
+    # 填写b站用户空间或用户id，爬取他的全部视频,不开启请填写None。
+    # target_count是爬取个数,默认4个。填写这里之后不再执行start_urls里内容。
+    userId=None         #'https://space.bilibili.com/883968/video' 
     target_count=5
     # 其他参数
-    VIDEO_QUALITY=16  #pipeline视频质量16 32 64 80 -> 360p 480p 720p 1080p
-    PROXIES_LIST=[] #[{"http":"117.94.213.117:8118"},{"http":"127.0.0.1:8080"},{"http":"127.0.0.1:8080"},{"http":"127.0.0.1:8080"}]
+    VIDEO_QUALITY=16    #pipeline视频质量16 32 64 80 -> 360p 480p 720p 1080p
+    PROXIES_LIST=[]     #[{"http":"117.94.213.117:8118"},{"http":"127.0.0.1:8080"},{"http":"127.0.0.1:8080"},{"http":"127.0.0.1:8080"}]
 
 
 

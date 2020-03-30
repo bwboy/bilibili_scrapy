@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-import scrapy,re,json
+import scrapy,re,logging,json
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options    # 使用无头浏览器
 from bilibili.items import VideoInfoItem
 from copy import deepcopy
 from bilibili import settings
-import logging
+
+#初始化全局配置。
 logger=logging.getLogger()
 chrome_options = Options()
 chrome_options.add_argument("--headless")
@@ -16,23 +17,26 @@ chrome_options.add_argument('User-Agent="Mozilla/5.0 (Windows NT 10.0; WOW64) Ap
 class RankingspiderSpider(scrapy.Spider):
     name = 'rankingspider'
     allowed_domains = ['bilibili.com']
-    URL='https://www.bilibili.com/ranking/'
     download_dir=settings.getDownloadDir()
     webdriver_path=settings.getWebDriverPath()
-    target_count=4
-    MAX_THREAD=5
-    VIDEO_QUALITY=16  #pipeline视频质量16 32 64 80 -> 360p 480p 720p 1080p
-    TARGET_CLASS=6   #全站 动画 国创相关 音乐 舞蹈 游戏 科技 数码 生活 鬼畜 时尚 娱乐 影视
-    PROXIES_LIST=[] #[{"http":"117.94.213.117:8118"},{"http":"127.0.0.1:8080"},{"http":"127.0.0.1:8080"},{"http":"127.0.0.1:8080"}]
+    # 可选参数部分
+    # 排行榜链接
+    URL='https://www.bilibili.com/ranking/'
+    target_count=4      # 目标视频个数
+    MAX_THREAD=5        # 最大线程数
+    VIDEO_QUALITY=16    # pipeline视频质量16 32 64 80 -> 360p 480p 720p 1080p
+    TARGET_CLASS=6      # 全站 动画 国创相关 音乐 舞蹈 游戏 科技 数码 生活 鬼畜 时尚 娱乐 影视
+    PROXIES_LIST=[]     # [{"http":"117.94.213.117:8118"},{"http":"127.0.0.1:8080"},{"http":"127.0.0.1:8080"},{"http":"127.0.0.1:8080"}]
 
     # 实例化一个浏览器对象
     def __init__(self):
+        # 填写并检查初始化参数
         try:
             self.check_param()
         except expression as e:
             logger.warning("输入参数有误，已返回默认值。")
         self.LOGGING=[]
-        self.EnableProxy=False
+        self.EnableProxy=False  #当为True时，代理池没有代理将抛出异常
         self.browser = webdriver.Chrome(self.webdriver_path,chrome_options=chrome_options)
         self.browser.implicitly_wait(10)
         super().__init__()

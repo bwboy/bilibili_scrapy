@@ -17,7 +17,16 @@ headers_list = {
     'Host': 'api.bilibili.com'
 }
 
-
+header_download={
+        'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:56.0) Gecko/20100101 Firefox/56.0',
+        'Accept': '*/*',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Range': 'bytes=0-',  # Range 的值要为 bytes=0- 才能下载完整视频
+        'Referer': 'https://api.bilibili.com/x/web-interface/view?aid='+str(98645441),  # 注意修改referer,必须要加的!
+        'Origin': 'https://www.bilibili.com',
+        'Connection': 'keep-alive',
+    }
 
 def get_cid():
 
@@ -90,6 +99,8 @@ def download_video(video_url,header_download,download_dir,video_title):
             f.write(chunk)
     f.close()
 
+
+
 ''' 测试requests 下载图像  '''
 def download_img(img_url,download_dir,video_title):
     response_stream=requests.get(url=img_url,stream=True)
@@ -111,6 +122,14 @@ def jsontest():
 
 if __name__ == "__main__":
     ssl._create_default_https_context = ssl._create_unverified_context
-    get_cid()
+    if not os.path.exists(download_dir+'/{}'.format("每天一遍")):
+        os.mkdir(download_dir+'/{}'.format("每天一遍"))
+    # download_video("http://upos-sz-mirrorks3.bilivideo.com/upgcxcode/66/93/168389366/168389366-1-30011.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1585319158&gen=playurl&os=ks3bv&oi=23011867&trid=cf24fa2321d848e59ddadf14f49e4bddu&platform=pc&upsig=d887ae15b389e9a7262af5c85b152e94&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,platform&mid=0&logo=40000000",
+    # header_download,
+    # download_dir,
+    # "每天一遍"
+
+    # )
+    #get_cid()
     #aaaa()
     # jsontest()

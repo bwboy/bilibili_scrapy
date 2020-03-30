@@ -24,8 +24,9 @@ class BilibiliPipeline(object):
     def process_item(self, item, spider):
         return item
 
-
-
+'''
+当启用mysql时每条数据蒋经过此类处理。
+'''
 class MysqlPipeline(object):
     def open_spider(self,spider):
         self.client=connect(
@@ -100,20 +101,14 @@ class MysqlPipeline(object):
                 item["avid"],
                 item["cid"],
             ]
-
             sql2='insert into bilibili_info VALUES(0,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'
             self.cursor.execute(sql2,args2)
-
-        
-
         self.client.commit()
         return item
-
 
     def close_spider(self,spider):
         self.cursor.close()
         self.client.close()
-
 
 class RankingPipeline(object):
     threads_list=[]
@@ -162,9 +157,13 @@ class RankingPipeline(object):
         }
         detail_url='https://api.bilibili.com/x/player/playurl?cid={}&avid={}&qn={}'.format(item['cid'], item["avid"], spider.VIDEO_QUALITY)
         jsonp=requests.get(url=detail_url,headers=headers).json()
+
+        # 获取视频列表，这个函数看看视频有多少段。
         video_list=[]
         for video_item in jsonp['data']['durl']:
             video_list.append(video_item['url'])
+
+        # 下载视频封面图
         if not os.path.exists(os.path.join(spider.download_dir, 'bilibili_video', item['title'])):
             os.mkdir(os.path.join(spider.download_dir, 'bilibili_video', item['title']))
         item["file_content"]=str(os.path.join(spider.download_dir, 'bilibili_video', item['title']))
@@ -172,6 +171,7 @@ class RankingPipeline(object):
         img=self.executer.submit(self.download_img,item["img_url"],img_name)
         self.threads_list.append(img)
 
+        # 判断视频是否包含分P，若包含则进行分P下载。
         if item['pages']>1:
             count=1
             for video_url in video_list:
@@ -186,12 +186,14 @@ class RankingPipeline(object):
                 self.threads_list.append(video_download)
         return item
 
+    # 下载图片函数，由线程池执行。
     def download_img(self,img_url,filename):
         response_img=requests.get(url=img_url,verify=False,stream=True)
         with open(filename,'wb+') as f:
             f.write(response_img.content)
         print("【图片下载完成】：{}".format(filename))
 
+    # 下载视频函数由线程池执行。
     def download_video(self,url,filename,headers):
         
         self.SUCCESS_QUEUE.put({"url":url,"filename":filename,"headers":headers})
@@ -213,6 +215,7 @@ class RankingPipeline(object):
                 f.write(chunk)
         f.close()
         
+    # 重试下载函数
     def download_retry(self,filename,url,headers):
         count=0
         while True:

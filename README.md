@@ -2,7 +2,7 @@
 @[TOC](Bilibili爬虫url分析) 
 # 项目总体说明 
 ## 特性 
-bilibili视频爬取工具。支持`线程池`、`Mysql`、`Mongo`、`设置代理`。支持从`排行榜`爬取、从`用户投稿空间`爬取、和`单个、多个视频`爬取和`分P`爬取。
+bilibili视频爬取工具。可以自定义支持`线程池`、`Mysql`、`Mongo`、`设置代理`。支持从`排行榜`爬取、从`用户投稿空间`爬取、和`单个、多个视频`爬取和`分P`爬取、缩略图爬取和元信息(metadata)爬取,元信息可以看数据库表结构。
 + `userspider.py`用户投稿全部爬取。
 + `rankingspider.py` 爬取排行榜。
 + `test01.py`测试用，用于手动爬取排行榜，性能比较低不推荐使用。
@@ -227,8 +227,8 @@ CREATE TABLE `bilibili_info` (
   `barrage` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `tags` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `classes` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `file_content` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-      `avid` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `file_content` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `avid` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `cid` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=224 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
