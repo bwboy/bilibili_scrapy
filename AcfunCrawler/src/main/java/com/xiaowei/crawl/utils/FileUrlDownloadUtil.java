@@ -5,6 +5,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.HashSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class FileUrlDownloadUtil {
     /**
@@ -90,14 +93,19 @@ public class FileUrlDownloadUtil {
      */
     public static void main(String[] args) {
 
-        downloadFile("http://pic.ibaotu.com/mp3Watermark_v3/19/45/81/90b6614d19ec063b643edf92682d3f55.mp3",
-                "F:/",
-                "aaaa.mp3",
-                "GET");
+//        downloadFile("http://pic.ibaotu.com/mp3Watermark_v3/19/45/81/90b6614d19ec063b643edf92682d3f55.mp3",
+//                "F:/",
+//                "aaaa.mp3",
+//                "GET");
+//
+//        String s = ":阿的说法\\\\/.&*(阿斯蒂芬阿萨德()/*`~?<|第三发送方式{:。}>-,';][=-!#$%^&*+@\\水电费第三方分";
+//        s = s.replaceAll("[\\pP\\p{Punct}]", "");
+//        System.out.println(s);
+        HashSet<String> urls = HttpRequest.getAcidsFromUser("https://www.acfun.cn/space/next?uid=11039293&type=video&orderBy=2&pageNo=",1);
 
-        String s = ":阿的说法\\\\/.&*(阿斯蒂芬阿萨德()/*`~?<|第三发送方式{:。}>-,';][=-!#$%^&*+@\\水电费第三方分";
-        s = s.replaceAll("[\\pP\\p{Punct}]", "");
-        System.out.println(s);
+        for(String url:urls){
+            System.out.println(url);
+        }
     }
 
 }

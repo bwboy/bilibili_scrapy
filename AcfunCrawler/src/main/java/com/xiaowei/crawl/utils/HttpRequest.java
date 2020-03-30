@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class HttpRequest {
     /**
@@ -23,8 +25,8 @@ public class HttpRequest {
      * @param param 请求参数，请求参数应该是 name1=value1&name2=value2 的形式。
      * @return URL 所代表远程资源的响应结果
      */
-    public static String sendGet(String url,String param) {
-        String URL=url+"?"+param;
+    public static String sendGet(String url, String param) {
+        String URL = url + "?" + param;
         return sendGet(URL);
     }
 
@@ -131,10 +133,10 @@ public class HttpRequest {
     }
 
 
-
-    public static HashSet<String> getAcids(String url){
-        HashSet<String> urls=new HashSet<String>();
-        String text = new String( HttpRequest.sendGet(url));
+    //排行榜接口获取acid列表集合。
+    public static HashSet<String> getAcids(String url) {
+        HashSet<String> urls = new HashSet<String>();
+        String text = new String(HttpRequest.sendGet(url));
         JSONObject obj = JSON.parseObject(text);
         JSONArray arry = (JSONArray) obj.get("rankList");
         for (Object a : arry) {
@@ -150,6 +152,35 @@ public class HttpRequest {
 
         } catch (IOException iox) {
 
+        }
+        return urls;
+    }
+
+
+    //
+
+    public static HashSet<String> getAcidsFromUser(String url, Integer pageNum) {
+        String fullurl = url + pageNum;
+        HashSet<String> urls = new HashSet<String>();
+        JSONObject obj = JSONObject.parseObject(HttpRequest.sendGet(fullurl));
+        JSONObject data = (JSONObject) obj.get("data");
+        JSONObject page = (JSONObject) data.get("page");
+        String str = data.get("html").toString();
+        Pattern pattern = Pattern.compile("/v/ac[1-9][0-9]{4,}");
+        Matcher matcher = pattern.matcher(str);
+
+        while (matcher.find()) {
+            urls.add("https://www.acfun.cn" + matcher.group());
+        }
+
+        if (pageNum == 1) {
+            int totalPage = Integer.parseInt(page.get("totalPage").toString());
+            if (totalPage >= 2) {
+                for (int i = 2; i <= totalPage; i++) {
+                    HashSet<String> page_urls = getAcidsFromUser(url, i);
+                    urls.addAll(page_urls);
+                }
+            }
         }
         return urls;
     }
