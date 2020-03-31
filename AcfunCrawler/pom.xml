@@ -23,6 +23,16 @@
         <version>1.18.10</version>
         <scope>provided</scope>
     </dependency>
+    <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>24.0-jre</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpcore</artifactId>
+        <version>4.4.13</version>
+    </dependency>
 
 
 </dependencies>

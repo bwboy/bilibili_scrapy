@@ -11,18 +11,13 @@ import java.io.*;
 import java.util.*;
 
 /**
- * 解析页面工具类
- *
- * @author tangjingya
+ * @author tangjingya  吴晓伟
+ * Desc:包含
+ * 1.获取视频信息工具
+ * 2.找到ts文件并合并的工具
+ * 3.合并二级制文件工具
  */
 public class ParsePageUtil {
-    public static String rootPath = "";
-
-    static {
-//	        rootPath = Crawler.class.getResource("").getPath().substring(1).replace("target/classes/", "src/main/resources");
-        rootPath = "F:\\Documents\\workspace-eclipse\\crawler_acfun\\src\\main\\resources";
-    }
-
     public static void main(String[] args) throws InterruptedException, IOException {
 
 //        VideoInfo a=getFileDownloadUrls("https://m.acfun.cn/v/?ac=14134176");
@@ -60,32 +55,14 @@ public class ParsePageUtil {
 
     }
 
-    //合并文件。
-    public static void mergeDownloadFiles(String fileContent,String fileName){
-        File file = new File(fileContent);
-        File[] fileList = file.listFiles(new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                return name.contains(".ts");
-            }
-        });
-        String[] files = new String[fileList.length];
-        for (int i = 0; i < fileList.length; i++) {
-            files[i] = fileList[i].getPath();
-            System.out.println(files[i]);
-        }
-        String fullName=fileContent+"/"+fileName;
-       if(fileContent.endsWith("/")||fileContent.endsWith("\\")){
-           fullName=fileContent+fileName;
-       }
-        mergeFiles(files, fullName);
-        System.out.println("视频合并完成;"+fullName);
-    }
-
-
-
+    /**
+     * @author tangyajing 吴晓伟
+     * @param url 输入文件ac号的地址 例如 https://www.acfun.cn/v/ac100000000001
+     * @return VideoInfo 包含视频全部信息 主要包含了3-4个m3u8的文件下载地址
+     * desc 输入url返回一个VideoInfo视频对象
+     * */
     public static VideoInfo getFileDownloadUrls(String url) {
         LinkedList<String> m3u8_urls = new LinkedList<String>();
-
 
         StringBuffer stringBuffer = new StringBuffer(HttpRequest.sendGet(url));
 
@@ -151,7 +128,43 @@ public class ParsePageUtil {
         return videoInfo;
     }
 
+    /**
+     * @author 吴晓伟
+     * @param fileContent 待文件目录
+     * @param fileName 合并到的目标文件
+     * @return boolean 合并成功？
+     * desc 找到并合并ts文件
+     * */
+    public static void mergeDownloadFiles(String fileContent,String fileName){
+        File file = new File(fileContent);
+        File[] fileList = file.listFiles(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.contains(".ts");
+            }
+        });
+        String[] files = new String[fileList.length];
+        for (int i = 0; i < fileList.length; i++) {
+            files[i] = fileList[i].getPath();
+            System.out.println(files[i]);
+        }
+        String fullName=fileContent+"/"+fileName;
+        if(fileContent.endsWith("/")||fileContent.endsWith("\\")){
+            fullName=fileContent+fileName;
+        }
+        boolean success = mergeFiles(files, fullName);
+        if (!success){
+            System.out.println("视频合并失败！");
+        }
+        System.out.println("视频合并完成;"+fullName);
+    }
 
+    /**
+     * @author 吴晓伟
+     * @param fpaths 待文件列表
+     * @param resultPath 合并到的目标文件
+     * @return boolean 合并成功？
+     * desc  合并视频文件
+     * */
     public static boolean mergeFiles(String[] fpaths, String resultPath) {
         if (fpaths == null || fpaths.length < 1 || TextUtils.isEmpty(resultPath)) {
             return false;

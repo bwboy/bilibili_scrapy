@@ -1,11 +1,10 @@
 package com.xiaowei.crawl.utils;
 
+import com.xiaowei.crawl.factory.ProxiesFactory;
+
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.HashSet;
+import java.net.*;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,16 +16,40 @@ public class FileUrlDownloadUtil {
      * @param downloadDir 文件存放目录
      * @return 返回下载文件
      */
+
     @SuppressWarnings("finally")
     public static File downloadFile(String urlPath, String downloadDir, String filename, String method) {
+        String proxy = "127.0.0.1:80";
+        return downloadFile(urlPath,downloadDir,filename,method,proxy);
+    }
+    @SuppressWarnings("finally")
+    public static File downloadFile(String urlPath, String downloadDir, String filename,String method,String proxy) {
+        List<HashMap<String,String>> proxies =new LinkedList<HashMap<String, String>>();
+        HashMap<String,String> a= new HashMap<String,String>();
+        a.put(proxy.split(":")[0],proxy.split(":")[1]);
+        proxies.add(a);
+        return downloadFile(urlPath,downloadDir,filename,method,proxies);
+    }
+    @SuppressWarnings("finally")
+    public static File downloadFile(String urlPath, String downloadDir, String filename, String method, List<HashMap<String,String>> proxy) {
         File file = null;
         try {
+            ProxiesFactory proxiesFactory =new ProxiesFactory();
             // 统一资源
             URL url = new URL(urlPath);
             // 连接类的父类，抽象类
-            URLConnection urlConnection = url.openConnection();
+            URLConnection urlConnection = null;
+
+            Proxy proxies=proxiesFactory.makeProxies(proxy);
+            if (!proxies.address().toString().equals("127.0.0.1")){
+                urlConnection= url.openConnection(proxies);
+            }else {
+                urlConnection= url.openConnection();
+            }
+
             // http的连接类
             HttpURLConnection httpURLConnection = (HttpURLConnection) urlConnection;
+
             //设置超时
             httpURLConnection.setConnectTimeout(1000 * 5);
             //设置请求方式，默认是GET
@@ -67,7 +90,7 @@ public class FileUrlDownloadUtil {
                 len += size;
                 out.write(buf, 0, size);
                 // 控制台打印文件下载的百分比情况
-                System.out.println("下载了-------> " + len * 100 / fileLength + "%\n");
+//                System.out.println("下载了-------> " + len * 100 / fileLength + "%\n");
             }
             // 关闭资源
             bin.close();
@@ -101,11 +124,45 @@ public class FileUrlDownloadUtil {
 //        String s = ":阿的说法\\\\/.&*(阿斯蒂芬阿萨德()/*`~?<|第三发送方式{:。}>-,';][=-!#$%^&*+@\\水电费第三方分";
 //        s = s.replaceAll("[\\pP\\p{Punct}]", "");
 //        System.out.println(s);
-        HashSet<String> urls = HttpRequest.getAcidsFromUser("https://www.acfun.cn/space/next?uid=11039293&type=video&orderBy=2&pageNo=",1);
+//        HashSet<String> urls = HttpRequest.getAcidsFromUser("https://www.acfun.cn/space/next?uid=11039293&type=video&orderBy=2&pageNo=",1);
+//
+//        for(String url:urls){
+//            System.out.println(url);
+//        }
 
-        for(String url:urls){
-            System.out.println(url);
+        try {
+            getALLProxies("proxy.txt").forEach(a->{
+                System.out.println(a.get("ip")+":"+a.get("port"));
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
+    /**
+     * 说明：根据指定URL将文件下载到指定目标位置
+     *
+     * @param filePath     proxy文件路径
+     * @return 代理列表。
+     */
+    public  static LinkedList<HashMap<String,String>> getALLProxies(String filePath) throws IOException {
+        LinkedList<HashMap<String,String>> proxies=  new LinkedList<HashMap<String,String>>();
+        File file =new File(filePath);
+        if (!file.exists()){
+            file.createNewFile();
+            return proxies;
+        }
+        BufferedReader br=new BufferedReader(new FileReader(file));
+        String str = null;
+        while((str = br.readLine()) != null){
+            if(!str.startsWith("#")&&!str.equals("")){
+                HashMap<String,String> proxy =new HashMap<String,String>();
+                proxy.put("ip",str.split(":")[0]);
+                proxy.put("port",str.split(":")[1]);
+                proxies.add(proxy);
+            }
+
+        }
+        return proxies;
+    }
 }

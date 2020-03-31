@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.io.Files;
-import edu.uci.ics.crawler4j.crawler.WebCrawler;
+
 
 import java.io.*;
 import java.net.URL;
@@ -17,6 +17,14 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * @author   吴晓伟
+ * Desc:包含
+ * 1.发送get请求 和 重载方法
+ * 2.发送post请求
+ * 3.从排行榜api接口获取acid列表集合。注意是rest形式。
+ * 4.从用户投稿取得acid列表集合。
+ */
 public class HttpRequest {
     /**
      * 向指定URL发送GET方法的请求
@@ -132,8 +140,13 @@ public class HttpRequest {
         return result;
     }
 
-
-    //排行榜接口获取acid列表集合。
+    /**
+     * 排行榜接口获取acid列表集合。
+     *
+     * @param url   排行榜api
+     * @return 全部acid列表的url集合。
+     *
+     */
     public static HashSet<String> getAcids(String url) {
         HashSet<String> urls = new HashSet<String>();
         String text = new String(HttpRequest.sendGet(url));
@@ -157,8 +170,14 @@ public class HttpRequest {
     }
 
 
-    //
-
+    /**
+     * 从用户投稿取得acid列表集合。
+     *
+     * @param url   用户投稿api
+     * @param pageNum   第几页。
+     * @return 全部acid列表的url集合。
+     *
+     */
     public static HashSet<String> getAcidsFromUser(String url, Integer pageNum) {
         String fullurl = url + pageNum;
         HashSet<String> urls = new HashSet<String>();
