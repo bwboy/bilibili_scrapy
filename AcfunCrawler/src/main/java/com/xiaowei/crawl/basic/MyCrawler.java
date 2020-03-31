@@ -28,7 +28,7 @@ public class MyCrawler {
         String downloadDir = "F:/study_project/webpack/scrapy/acfun_video/";  //注意一定加上/
 
         int VIDEO_QUALITY = 0;  //0是最高.3是最低。
-        int userId = 11039293;  //输入用户id爬取全部视频。默认为0
+        int userId = 0;  //输入用户id爬取全部视频。默认为0
 
         int DownloadDelay=1000;     //每次下载休息1s
         int MAX_THREAD=5;           //最大线程
@@ -44,10 +44,9 @@ public class MyCrawler {
 //        urls = HttpRequest.getAcids("https://www.acfun.cn/rest/pc-direct/rank/channel?channelId=&subChannelId=&rankLimit=3&rankPeriod=DAY");
 
         //2. 手动添加。随便找了几个短视频测试了一下。
-        urls.add("https://www.acfun.cn/v/ac14297460");
-        urls.add("https://www.acfun.cn/v/ac14134176");
-        urls.add("https://www.acfun.cn/v/ac14049069");
-        urls.add("https://www.acfun.cn/v/ac13845267");
+        urls.add("https://www.acfun.cn/v/ac14360707");
+        urls.add("https://www.acfun.cn/v/ac14349620");
+        urls.add("https://www.acfun.cn/v/ac14362609");
 
         //3. 从用户投稿爬取。给上面的userId填写用户id
         if (userId != 0) {
@@ -91,7 +90,7 @@ class CrawlerThread implements Runnable {
     String downloadDir;
     int VIDEO_QUALITY;
     int DownloadDelay;
-    List<HashMap<String,String>> proxies;
+    List<HashMap<String,String>> proxies=new LinkedList<HashMap<String,String>>();
 
     CrawlerThread(String url, String downloadDir, int VIDEO_QUALITY,int DownloadDelay) {
         this.URL = url;
@@ -100,7 +99,7 @@ class CrawlerThread implements Runnable {
         this.DownloadDelay=DownloadDelay;
     }
     CrawlerThread(String url, String downloadDir, int VIDEO_QUALITY,int DownloadDelay,List<HashMap<String,String>> proxies) {
-        super();
+        this( url,  downloadDir,  VIDEO_QUALITY, DownloadDelay);
         this.proxies=proxies;
     }
 
@@ -125,13 +124,11 @@ class CrawlerThread implements Runnable {
             String video_chip = text[i].split("#")[0];
             final String api = "https://tx-safety-video.acfun.cn/mediacloud/acfun/acfun_video/segment/" + video_chip;
             final int finalI = i;
-            Thread a = new Thread(new Runnable() {
-                public void run() {
-                    if (!proxies.isEmpty()){
-                        FileUrlDownloadUtil.downloadFile(api, file.getPath(), "/" + String.format("%04d", finalI) + ".ts", "GET",proxies);
-                    }else {
-                        FileUrlDownloadUtil.downloadFile(api, file.getPath(), "/" + String.format("%04d", finalI) + ".ts", "GET");
-                    }
+            Thread a = new Thread(() -> {
+                if (!proxies.isEmpty()){
+                    FileUrlDownloadUtil.downloadFile(api, file.getPath(), "/" + String.format("%04d", finalI) + ".ts", "GET",proxies);
+                }else {
+                    FileUrlDownloadUtil.downloadFile(api, file.getPath(), "/" + String.format("%04d", finalI) + ".ts", "GET");
                 }
             });
             a.start();
@@ -152,7 +149,8 @@ class CrawlerThread implements Runnable {
 
         if (video.videoList.size() >= 2 && !URL.contains("_")) {
             for (int i = 2; i <= video.videoList.size(); i++) {
-                CrawlerThread thread = new CrawlerThread(URL + "_" + i, downloadDir, VIDEO_QUALITY,DownloadDelay,proxies);
+                System.out.println(URL + "_" + i+"---------------"+ downloadDir+"---------------"+ VIDEO_QUALITY+"---------------"+DownloadDelay+"---------------"+proxies);
+                CrawlerThread thread = new CrawlerThread(this.URL + "_" + i, this.downloadDir, this.VIDEO_QUALITY,this.DownloadDelay,this.proxies);
                 Thread thread1 = new Thread(thread);
                 thread1.start();
                 thread1.join();

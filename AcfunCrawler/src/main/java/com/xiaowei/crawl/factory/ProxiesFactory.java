@@ -18,7 +18,7 @@ public class ProxiesFactory {
 
         public Proxy makeProxies(List<HashMap<String,String> > proxies) {
 
-            HashMap<String,String> proxy = proxies.get(new Random().nextInt(proxies.size()+1));
+            HashMap<String,String> proxy = proxies.get(new Random().nextInt(proxies.size()));
 
             InetSocketAddress addr = new InetSocketAddress(proxy.get("ip"), Integer.parseInt(proxy.get("port")));
 

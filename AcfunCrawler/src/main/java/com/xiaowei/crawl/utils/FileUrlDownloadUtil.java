@@ -26,7 +26,8 @@ public class FileUrlDownloadUtil {
     public static File downloadFile(String urlPath, String downloadDir, String filename,String method,String proxy) {
         List<HashMap<String,String>> proxies =new LinkedList<HashMap<String, String>>();
         HashMap<String,String> a= new HashMap<String,String>();
-        a.put(proxy.split(":")[0],proxy.split(":")[1]);
+        a.put("ip",proxy.split(":")[0]);
+        a.put("port",proxy.split(":")[1]);
         proxies.add(a);
         return downloadFile(urlPath,downloadDir,filename,method,proxies);
     }
@@ -41,7 +42,7 @@ public class FileUrlDownloadUtil {
             URLConnection urlConnection = null;
 
             Proxy proxies=proxiesFactory.makeProxies(proxy);
-            if (!proxies.address().toString().equals("127.0.0.1")){
+            if (!proxies.address().toString().contains("127.0.0.1")){
                 urlConnection= url.openConnection(proxies);
             }else {
                 urlConnection= url.openConnection();
@@ -103,7 +104,11 @@ public class FileUrlDownloadUtil {
             // TODO Auto-generated catch block
             e.printStackTrace();
             System.out.println("文件下载失败！");
-        } finally {
+        }catch (Exception e){
+            System.out.println("出现错误");
+            System.out.println(e);
+        }
+        finally {
             return file;
         }
 
