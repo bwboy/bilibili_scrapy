@@ -20,32 +20,34 @@ public class FileUrlDownloadUtil {
     @SuppressWarnings("finally")
     public static File downloadFile(String urlPath, String downloadDir, String filename, String method) {
         String proxy = "127.0.0.1:80";
-        return downloadFile(urlPath,downloadDir,filename,method,proxy);
+        return downloadFile(urlPath, downloadDir, filename, method, proxy);
     }
+
     @SuppressWarnings("finally")
-    public static File downloadFile(String urlPath, String downloadDir, String filename,String method,String proxy) {
-        List<HashMap<String,String>> proxies =new LinkedList<HashMap<String, String>>();
-        HashMap<String,String> a= new HashMap<String,String>();
-        a.put("ip",proxy.split(":")[0]);
-        a.put("port",proxy.split(":")[1]);
+    public static File downloadFile(String urlPath, String downloadDir, String filename, String method, String proxy) {
+        List<HashMap<String, String>> proxies = new LinkedList<HashMap<String, String>>();
+        HashMap<String, String> a = new HashMap<String, String>();
+        a.put("ip", proxy.split(":")[0]);
+        a.put("port", proxy.split(":")[1]);
         proxies.add(a);
-        return downloadFile(urlPath,downloadDir,filename,method,proxies);
+        return downloadFile(urlPath, downloadDir, filename, method, proxies);
     }
+
     @SuppressWarnings("finally")
-    public static File downloadFile(String urlPath, String downloadDir, String filename, String method, List<HashMap<String,String>> proxy) {
+    public static File downloadFile(String urlPath, String downloadDir, String filename, String method, List<HashMap<String, String>> proxy) {
         File file = null;
         try {
-            ProxiesFactory proxiesFactory =new ProxiesFactory();
+
             // 统一资源
             URL url = new URL(urlPath);
             // 连接类的父类，抽象类
             URLConnection urlConnection = null;
 
-            Proxy proxies=proxiesFactory.makeProxies(proxy);
-            if (!proxies.address().toString().contains("127.0.0.1")){
-                urlConnection= url.openConnection(proxies);
-            }else {
-                urlConnection= url.openConnection();
+            Proxy proxies = ProxiesFactory.getInstance().makeProxies(proxy);
+            if (!proxies.address().toString().contains("127.0.0.1")) {
+                urlConnection = url.openConnection(proxies);
+            } else {
+                urlConnection = url.openConnection();
             }
 
             // http的连接类
@@ -104,11 +106,10 @@ public class FileUrlDownloadUtil {
             // TODO Auto-generated catch block
             e.printStackTrace();
             System.out.println("文件下载失败！");
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println("出现错误");
             System.out.println(e);
-        }
-        finally {
+        } finally {
             return file;
         }
 
@@ -136,8 +137,8 @@ public class FileUrlDownloadUtil {
 //        }
 
         try {
-            getALLProxies("proxy.txt").forEach(a->{
-                System.out.println(a.get("ip")+":"+a.get("port"));
+            getALLProxies("proxy.txt").forEach(a -> {
+                System.out.println(a.get("ip") + ":" + a.get("port"));
             });
         } catch (IOException e) {
             e.printStackTrace();
@@ -147,23 +148,23 @@ public class FileUrlDownloadUtil {
     /**
      * 说明：根据指定URL将文件下载到指定目标位置
      *
-     * @param filePath     proxy文件路径
+     * @param filePath proxy文件路径
      * @return 代理列表。
      */
-    public  static LinkedList<HashMap<String,String>> getALLProxies(String filePath) throws IOException {
-        LinkedList<HashMap<String,String>> proxies=  new LinkedList<HashMap<String,String>>();
-        File file =new File(filePath);
-        if (!file.exists()){
+    public static LinkedList<HashMap<String, String>> getALLProxies(String filePath) throws IOException {
+        LinkedList<HashMap<String, String>> proxies = new LinkedList<HashMap<String, String>>();
+        File file = new File(filePath);
+        if (!file.exists()) {
             file.createNewFile();
             return proxies;
         }
-        BufferedReader br=new BufferedReader(new FileReader(file));
+        BufferedReader br = new BufferedReader(new FileReader(file));
         String str = null;
-        while((str = br.readLine()) != null){
-            if(!str.startsWith("#")&&!str.equals("")){
-                HashMap<String,String> proxy =new HashMap<String,String>();
-                proxy.put("ip",str.split(":")[0]);
-                proxy.put("port",str.split(":")[1]);
+        while ((str = br.readLine()) != null) {
+            if (!str.startsWith("#") && !str.equals("")) {
+                HashMap<String, String> proxy = new HashMap<String, String>();
+                proxy.put("ip", str.split(":")[0]);
+                proxy.put("port", str.split(":")[1]);
                 proxies.add(proxy);
             }
 

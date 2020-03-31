@@ -18,7 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * @author   吴晓伟
+ * @author 吴晓伟
  * Desc:包含
  * 1.发送get请求 和 重载方法
  * 2.发送post请求
@@ -143,9 +143,8 @@ public class HttpRequest {
     /**
      * 排行榜接口获取acid列表集合。
      *
-     * @param url   排行榜api
+     * @param url 排行榜api
      * @return 全部acid列表的url集合。
-     *
      */
     public static HashSet<String> getAcids(String url) {
         HashSet<String> urls = new HashSet<String>();
@@ -173,10 +172,9 @@ public class HttpRequest {
     /**
      * 从用户投稿取得acid列表集合。
      *
-     * @param url   用户投稿api
-     * @param pageNum   第几页。
+     * @param url     用户投稿api
+     * @param pageNum 第几页。
      * @return 全部acid列表的url集合。
-     *
      */
     public static HashSet<String> getAcidsFromUser(String url, Integer pageNum) {
         String fullurl = url + pageNum;

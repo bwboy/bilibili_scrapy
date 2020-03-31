@@ -27,13 +27,13 @@ public class MyCrawler {
     public static void main(String[] args) {
         String downloadDir = "F:/study_project/webpack/scrapy/acfun_video/";  //注意一定加上/
 
-        int VIDEO_QUALITY = 0;  //0是最高.3是最低。
+        int VIDEO_QUALITY = 3;  //0是最高.3是最低。
         int userId = 0;  //输入用户id爬取全部视频。默认为0
 
-        int DownloadDelay=1000;     //每次下载休息1s
-        int MAX_THREAD=5;           //最大线程
+        int DownloadDelay = 1000;     //每次下载休息1s
+        int MAX_THREAD = 5;           //最大线程
 
-        boolean USE_PROXIES=false;  //使用代理,在根目录的proxy.txt添加代理。按照规则添加
+        boolean USE_PROXIES = false;  //使用代理,在根目录的proxy.txt添加代理。按照规则添加
 
         /**
          * @Varb urls 是一个acid(https://www.acfun.cn/v/ac14297460)的列表集合。
@@ -54,19 +54,19 @@ public class MyCrawler {
         }
 
 
-        List<HashMap<String,String>> proxies=new LinkedList<HashMap<String, String>>();
+        List<HashMap<String, String>> proxies = new LinkedList<HashMap<String, String>>();
         try {
-            proxies=FileUrlDownloadUtil.getALLProxies("proxy.txt");
+            proxies = FileUrlDownloadUtil.getALLProxies("proxy.txt");
         } catch (IOException e) {
             e.printStackTrace();
         }
         ExecutorService fixedThreadPool = Executors.newFixedThreadPool(MAX_THREAD);
         for (String url : urls) {
 
-            if(!USE_PROXIES){
-                fixedThreadPool.execute(new CrawlerThread(url, downloadDir, VIDEO_QUALITY,DownloadDelay));
-            }else {
-                fixedThreadPool.execute(new CrawlerThread(url, downloadDir, VIDEO_QUALITY,DownloadDelay,proxies));
+            if (!USE_PROXIES) {
+                fixedThreadPool.execute(new CrawlerThread(url, downloadDir, VIDEO_QUALITY, DownloadDelay));
+            } else {
+                fixedThreadPool.execute(new CrawlerThread(url, downloadDir, VIDEO_QUALITY, DownloadDelay, proxies));
             }
 
         }
@@ -90,17 +90,20 @@ class CrawlerThread implements Runnable {
     String downloadDir;
     int VIDEO_QUALITY;
     int DownloadDelay;
-    List<HashMap<String,String>> proxies=new LinkedList<HashMap<String,String>>();
+    List<HashMap<String, String>> proxies = new LinkedList<HashMap<String, String>>();
+    ExecutorService fixedThreadPool = Executors.newFixedThreadPool(5);
 
-    CrawlerThread(String url, String downloadDir, int VIDEO_QUALITY,int DownloadDelay) {
+
+    CrawlerThread(String url, String downloadDir, int VIDEO_QUALITY, int DownloadDelay) {
         this.URL = url;
         this.downloadDir = downloadDir;
         this.VIDEO_QUALITY = VIDEO_QUALITY;
-        this.DownloadDelay=DownloadDelay;
+        this.DownloadDelay = DownloadDelay;
     }
-    CrawlerThread(String url, String downloadDir, int VIDEO_QUALITY,int DownloadDelay,List<HashMap<String,String>> proxies) {
-        this( url,  downloadDir,  VIDEO_QUALITY, DownloadDelay);
-        this.proxies=proxies;
+
+    CrawlerThread(String url, String downloadDir, int VIDEO_QUALITY, int DownloadDelay, List<HashMap<String, String>> proxies) {
+        this(url, downloadDir, VIDEO_QUALITY, DownloadDelay);
+        this.proxies = proxies;
     }
 
     @SneakyThrows
@@ -110,50 +113,55 @@ class CrawlerThread implements Runnable {
         if (!file.exists()) {
             file.mkdir();
         }
-
         //清晰度获取,目标视频清晰度可能不存在。于是降级。
         String url = video.getUrls().get(VIDEO_QUALITY);
         while (url == null) {
             url = video.getUrls().get(VIDEO_QUALITY - 1);
         }
         String res = HttpRequest.sendGet(url);
-
         String[] text = res.split(",");
-        List<Thread> tasks = new LinkedList<Thread>();
+        ExecutorService chipsThreadPool = Executors.newFixedThreadPool(5);
         for (int i = 1; i < text.length; i++) {
             String video_chip = text[i].split("#")[0];
             final String api = "https://tx-safety-video.acfun.cn/mediacloud/acfun/acfun_video/segment/" + video_chip;
             final int finalI = i;
-            Thread a = new Thread(() -> {
-                if (!proxies.isEmpty()){
-                    FileUrlDownloadUtil.downloadFile(api, file.getPath(), "/" + String.format("%04d", finalI) + ".ts", "GET",proxies);
-                }else {
-                    FileUrlDownloadUtil.downloadFile(api, file.getPath(), "/" + String.format("%04d", finalI) + ".ts", "GET");
-                }
-            });
-            a.start();
-            tasks.add(a);
-        }
-        for (Thread item : tasks) {
-            item.join();
-        }
 
+            if (!proxies.isEmpty()) {
+                chipsThreadPool.execute(new Thread(() -> {
+                    FileUrlDownloadUtil.downloadFile(api, file.getPath(), "/" + String.format("%04d", finalI) + ".ts", "GET", proxies);
+                }));
+            } else {
+                chipsThreadPool.execute(new Thread(() -> {
+                    FileUrlDownloadUtil.downloadFile(api, file.getPath(), "/" + String.format("%04d", finalI) + ".ts", "GET");
+                }));
+            }
+        }
+        chipsThreadPool.shutdown();
+        while (!chipsThreadPool.isTerminated()) {
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         if (!URL.contains("_")) {
             ParsePageUtil.mergeDownloadFiles(file.getPath(), video.getVideoList().get(0).get("title").toString().replaceAll("[\\pP\\p{Punct}]", "_") + ".mp4");
         } else {
             int p = Integer.parseInt(URL.split("_")[1]) - 1;
             ParsePageUtil.mergeDownloadFiles(file.getPath(), video.getVideoList().get(p).get("title").toString().replaceAll("[\\pP\\p{Punct}]", "_") + ".mp4");
         }
-
         Thread.sleep(DownloadDelay);
-
         if (video.videoList.size() >= 2 && !URL.contains("_")) {
             for (int i = 2; i <= video.videoList.size(); i++) {
-                System.out.println(URL + "_" + i+"---------------"+ downloadDir+"---------------"+ VIDEO_QUALITY+"---------------"+DownloadDelay+"---------------"+proxies);
-                CrawlerThread thread = new CrawlerThread(this.URL + "_" + i, this.downloadDir, this.VIDEO_QUALITY,this.DownloadDelay,this.proxies);
-                Thread thread1 = new Thread(thread);
-                thread1.start();
-                thread1.join();
+                fixedThreadPool.execute(new CrawlerThread(this.URL + "_" + i, this.downloadDir, this.VIDEO_QUALITY, this.DownloadDelay, this.proxies));
+            }
+            fixedThreadPool.shutdown();
+            while (!fixedThreadPool.isTerminated()) {
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
 

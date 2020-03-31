@@ -24,40 +24,25 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/basic/MyCrawler.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="80">
-              <caret line="130" column="40" selection-start-line="130" selection-start-column="40" selection-end-line="130" selection-end-column="40" />
+            <state relative-caret-position="1938">
+              <caret line="114" column="9" selection-start-line="114" selection-start-column="9" selection-end-line="114" selection-end-column="9" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#1882#1907#0" expanded="true" />
+                <element signature="e#1874#1899#0" expanded="true" />
                 <element signature="e#2962#2986#0" expanded="true" />
-                <element signature="e#3819#3827#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="jar://C:/Program Files/Java/jdk1.8.0_171/src.zip!/java/io/File.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="126">
-              <caret line="511" selection-start-line="511" selection-end-line="511" />
-              <folding>
-                <element signature="e#21162#21163#0" expanded="true" />
-                <element signature="e#75713#75714#0" expanded="true" />
-                <element signature="e#75750#75751#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/utils/FileUrlDownloadUtil.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="118">
-              <caret line="43" column="60" lean-forward="true" selection-start-line="43" selection-start-column="60" selection-end-line="43" selection-end-column="60" />
+            <state relative-caret-position="103">
+              <caret line="155" column="39" selection-start-line="155" selection-start-column="39" selection-end-line="155" selection-end-column="39" />
               <folding>
                 <element signature="e#848#873#0" expanded="true" />
                 <element signature="e#922#937#0" expanded="true" />
@@ -70,8 +55,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/factory/ProxiesFactory.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="156">
-              <caret line="24" selection-start-line="24" selection-end-line="24" />
+            <state relative-caret-position="154">
+              <caret line="33" column="5" selection-start-line="33" selection-start-column="5" selection-end-line="33" selection-end-column="5" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -82,8 +67,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/utils/ParsePageUtil.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="105">
-              <caret line="71" selection-start-line="71" selection-end-line="71" />
+            <state relative-caret-position="124">
+              <caret line="71" lean-forward="true" selection-start-line="71" selection-end-line="71" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#main#0;class#ParsePageUtil#0" />
@@ -98,8 +83,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/utils/HttpRequest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="76">
-              <caret line="46" selection-start-line="46" selection-end-line="46" />
+            <state relative-caret-position="190">
+              <caret line="52" column="55" lean-forward="true" selection-start-line="52" selection-start-column="55" selection-end-line="52" selection-end-column="55" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#sendPost#0;class#HttpRequest#0" />
@@ -144,6 +129,7 @@
       <find>fetchPlayurl</find>
       <find>/x/p</find>
       <find>getFileDownloadUrls</find>
+      <find>合并</find>
     </findStrings>
     <dirStrings>
       <dir>F:\study_project\webpack\scrapy\bilibili_copy\AcfunCrawler\src\main</dir>
@@ -161,12 +147,12 @@
         <option value="$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/basic/aaaa.js" />
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/lab/aaaa.js" />
-        <option value="$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/utils/HttpRequest.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/utils/ParsePageUtil.java" />
         <option value="$PROJECT_DIR$/proxy.txt" />
         <option value="$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/basic/MyCrawler.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/factory/ProxiesFactory.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/utils/FileUrlDownloadUtil.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/factory/ProxiesFactory.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/utils/ParsePageUtil.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/utils/HttpRequest.java" />
       </list>
     </option>
   </component>
@@ -392,12 +378,12 @@
       <workItem from="1585493466038" duration="45583000" />
       <workItem from="1585618789687" duration="73000" />
       <workItem from="1585618889466" duration="8556000" />
-      <workItem from="1585657058567" duration="5353000" />
+      <workItem from="1585657058567" duration="7502000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="62526000" />
+    <option name="totallyTimeSpent" value="64675000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
@@ -412,8 +398,8 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.3847242" />
-      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.427157" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.13719943" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.427157" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -442,24 +428,31 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/utils/FileUrlDownloadUtil.java</url>
-          <line>44</line>
+          <line>46</line>
           <properties />
           <option name="timeStamp" value="30" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/factory/ProxiesFactory.java</url>
-          <line>22</line>
-          <properties />
-          <option name="timeStamp" value="32" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/factory/ProxiesFactory.java</url>
-          <line>20</line>
-          <properties />
-          <option name="timeStamp" value="33" />
-        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
+  </component>
+  <component name="debuggerHistoryManager">
+    <expressions id="evaluateExpression">
+      <expression>
+        <expression-string>proxies.address().toString().contains(&quot;127.0.0.1&quot;)</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>proxies.address().toString()</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>proxies.address()</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+    </expressions>
   </component>
   <component name="editorHistoryManager">
     <entry file="jar://$MAVEN_REPOSITORY$/edu/uci/ics/crawler4j/4.4.0/crawler4j-4.4.0.jar!/edu/uci/ics/crawler4j/crawler/WebCrawler.class">
@@ -650,10 +643,58 @@
         </state>
       </provider>
     </entry>
+    <entry file="jar://C:/Program Files/Java/jdk1.8.0_171/src.zip!/java/io/File.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="126">
+          <caret line="511" selection-start-line="511" selection-end-line="511" />
+          <folding>
+            <element signature="e#21162#21163#0" expanded="true" />
+            <element signature="e#75713#75714#0" expanded="true" />
+            <element signature="e#75750#75751#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/utils/FileUrlDownloadUtil.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="103">
+          <caret line="155" column="39" selection-start-line="155" selection-start-column="39" selection-end-line="155" selection-end-column="39" />
+          <folding>
+            <element signature="e#848#873#0" expanded="true" />
+            <element signature="e#922#937#0" expanded="true" />
+            <element signature="method#main#0;class#FileUrlDownloadUtil#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/factory/ProxiesFactory.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="154">
+          <caret line="33" column="5" selection-start-line="33" selection-start-column="5" selection-end-line="33" selection-end-column="5" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/utils/ParsePageUtil.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="124">
+          <caret line="71" lean-forward="true" selection-start-line="71" selection-end-line="71" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#main#0;class#ParsePageUtil#0" />
+            <element signature="e#3561#3569#0" expanded="true" />
+            <element signature="e#3846#3858#0" expanded="true" />
+            <element signature="method#mergeFiles#0;class#ParsePageUtil#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/utils/HttpRequest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="76">
-          <caret line="46" selection-start-line="46" selection-end-line="46" />
+        <state relative-caret-position="190">
+          <caret line="52" column="55" lean-forward="true" selection-start-line="52" selection-start-column="55" selection-end-line="52" selection-end-column="55" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#sendPost#0;class#HttpRequest#0" />
@@ -669,63 +710,14 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/utils/ParsePageUtil.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="71" selection-start-line="71" selection-end-line="71" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="method#main#0;class#ParsePageUtil#0" />
-            <element signature="e#3561#3569#0" expanded="true" />
-            <element signature="e#3846#3858#0" expanded="true" />
-            <element signature="method#mergeFiles#0;class#ParsePageUtil#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://C:/Program Files/Java/jdk1.8.0_171/src.zip!/java/io/File.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="126">
-          <caret line="511" selection-start-line="511" selection-end-line="511" />
-          <folding>
-            <element signature="e#21162#21163#0" expanded="true" />
-            <element signature="e#75713#75714#0" expanded="true" />
-            <element signature="e#75750#75751#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/basic/MyCrawler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="80">
-          <caret line="130" column="40" selection-start-line="130" selection-start-column="40" selection-end-line="130" selection-end-column="40" />
+        <state relative-caret-position="1938">
+          <caret line="114" column="9" selection-start-line="114" selection-start-column="9" selection-end-line="114" selection-end-column="9" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#1882#1907#0" expanded="true" />
+            <element signature="e#1874#1899#0" expanded="true" />
             <element signature="e#2962#2986#0" expanded="true" />
-            <element signature="e#3819#3827#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/factory/ProxiesFactory.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="156">
-          <caret line="24" selection-start-line="24" selection-end-line="24" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/xiaowei/crawl/utils/FileUrlDownloadUtil.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="118">
-          <caret line="43" column="60" lean-forward="true" selection-start-line="43" selection-start-column="60" selection-end-line="43" selection-end-column="60" />
-          <folding>
-            <element signature="e#848#873#0" expanded="true" />
-            <element signature="e#922#937#0" expanded="true" />
-            <element signature="method#main#0;class#FileUrlDownloadUtil#0" />
           </folding>
         </state>
       </provider>

@@ -16,14 +16,36 @@ import java.util.Random;
  */
 public class ProxiesFactory {
 
-        public Proxy makeProxies(List<HashMap<String,String> > proxies) {
+    public Proxy makeProxies(List<HashMap<String, String>> proxies) {
 
-            HashMap<String,String> proxy = proxies.get(new Random().nextInt(proxies.size()));
+        HashMap<String, String> proxy = proxies.get(new Random().nextInt(proxies.size()));
 
-            InetSocketAddress addr = new InetSocketAddress(proxy.get("ip"), Integer.parseInt(proxy.get("port")));
+        InetSocketAddress addr = new InetSocketAddress(proxy.get("ip"), Integer.parseInt(proxy.get("port")));
 
-            return new Proxy(Proxy.Type.HTTP, addr); // http 代理
+        return new Proxy(Proxy.Type.HTTP, addr); // http 代理
+    }
+
+
+    private static ProxiesFactory instance;
+
+    //1.构造方法私有化
+    private ProxiesFactory() {
+
+    }
+
+    //2.提供一个全局访问点 加锁后
+    public static ProxiesFactory getInstance() {
+        if (instance == null) {
+            synchronized (ProxiesFactory.class) {
+                if (instance == null) {
+                    instance = new ProxiesFactory();
+                }
+            }
         }
+        return instance;
+    }
+
+
     public static void main(String[] args) {
 
     }

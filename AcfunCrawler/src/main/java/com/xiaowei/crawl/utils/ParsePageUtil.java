@@ -37,7 +37,7 @@ public class ParsePageUtil {
             Thread a = new Thread(new Runnable() {
                 public void run() {
                     System.out.println(finalI);
-                    FileUrlDownloadUtil.downloadFile(api, "F:/study_project/webpack/scrapy/acfun_video", "/" + String.format("%04d",finalI) + ".ts", "GET");
+                    FileUrlDownloadUtil.downloadFile(api, "F:/study_project/webpack/scrapy/acfun_video", "/" + String.format("%04d", finalI) + ".ts", "GET");
                 }
             });
             a.start();
@@ -47,8 +47,7 @@ public class ParsePageUtil {
             item.join();
         }
 
-        mergeDownloadFiles("F:\\study_project\\webpack\\scrapy\\acfun_video\\","aaaa.mp4");
-
+        mergeDownloadFiles("F:\\study_project\\webpack\\scrapy\\acfun_video\\", "aaaa.mp4");
 
 
         System.out.println("主线程结束啦！");
@@ -56,11 +55,11 @@ public class ParsePageUtil {
     }
 
     /**
-     * @author tangyajing 吴晓伟
      * @param url 输入文件ac号的地址 例如 https://www.acfun.cn/v/ac100000000001
      * @return VideoInfo 包含视频全部信息 主要包含了3-4个m3u8的文件下载地址
      * desc 输入url返回一个VideoInfo视频对象
-     * */
+     * @author tangyajing 吴晓伟
+     */
     public static VideoInfo getFileDownloadUrls(String url) {
         LinkedList<String> m3u8_urls = new LinkedList<String>();
 
@@ -98,13 +97,12 @@ public class ParsePageUtil {
         JSONArray videos = (JSONArray) jsonObj.get("videoList");
 
 
-
         List<JSONObject> videoList = new LinkedList<JSONObject>();
         for (Object video : videos) {
             JSONObject t = (JSONObject) JSON.toJSON(video);
-            JSONObject obj =new JSONObject();
-            obj.put("title",t.get("title").toString());
-            obj.put("id",t.get("id").toString());
+            JSONObject obj = new JSONObject();
+            obj.put("title", t.get("title").toString());
+            obj.put("id", t.get("id").toString());
             videoList.add(obj);
 
         }
@@ -129,13 +127,13 @@ public class ParsePageUtil {
     }
 
     /**
-     * @author 吴晓伟
      * @param fileContent 待文件目录
-     * @param fileName 合并到的目标文件
+     * @param fileName    合并到的目标文件
      * @return boolean 合并成功？
      * desc 找到并合并ts文件
-     * */
-    public static void mergeDownloadFiles(String fileContent,String fileName){
+     * @author 吴晓伟
+     */
+    public static void mergeDownloadFiles(String fileContent, String fileName) {
         File file = new File(fileContent);
         File[] fileList = file.listFiles(new FilenameFilter() {
             public boolean accept(File dir, String name) {
@@ -147,24 +145,24 @@ public class ParsePageUtil {
             files[i] = fileList[i].getPath();
             System.out.println(files[i]);
         }
-        String fullName=fileContent+"/"+fileName;
-        if(fileContent.endsWith("/")||fileContent.endsWith("\\")){
-            fullName=fileContent+fileName;
+        String fullName = fileContent + "/" + fileName;
+        if (fileContent.endsWith("/") || fileContent.endsWith("\\")) {
+            fullName = fileContent + fileName;
         }
         boolean success = mergeFiles(files, fullName);
-        if (!success){
+        if (!success) {
             System.out.println("视频合并失败！");
         }
-        System.out.println("视频合并完成;"+fullName);
+        System.out.println("视频合并完成;" + fullName);
     }
 
     /**
-     * @author 吴晓伟
-     * @param fpaths 待文件列表
+     * @param fpaths     待文件列表
      * @param resultPath 合并到的目标文件
      * @return boolean 合并成功？
      * desc  合并视频文件
-     * */
+     * @author 吴晓伟
+     */
     public static boolean mergeFiles(String[] fpaths, String resultPath) {
         if (fpaths == null || fpaths.length < 1 || TextUtils.isEmpty(resultPath)) {
             return false;
