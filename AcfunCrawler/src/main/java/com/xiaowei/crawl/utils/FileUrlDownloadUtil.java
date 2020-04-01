@@ -1,5 +1,7 @@
 package com.xiaowei.crawl.utils;
 
+
+import com.sun.xml.internal.ws.util.StringUtils;
 import com.xiaowei.crawl.factory.ProxiesFactory;
 
 import java.io.*;
@@ -26,15 +28,21 @@ public class FileUrlDownloadUtil {
     @SuppressWarnings("finally")
     public static File downloadFile(String urlPath, String downloadDir, String filename, String method, String proxy) {
         List<HashMap<String, String>> proxies = new LinkedList<HashMap<String, String>>();
-        HashMap<String, String> a = new HashMap<String, String>();
-        a.put("ip", proxy.split(":")[0]);
-        a.put("port", proxy.split(":")[1]);
-        proxies.add(a);
-        return downloadFile(urlPath, downloadDir, filename, method, proxies);
+        String cookies="";
+        if (proxy.contains(":")){
+            HashMap<String, String> a = new HashMap<String, String>();
+            a.put("ip", proxy.split(":")[0]);
+            a.put("port", proxy.split(":")[1]);
+            proxies.add(a);
+        }else {
+            cookies=proxy;
+        }
+        return downloadFile(urlPath, downloadDir, filename, method, proxies,cookies);
     }
 
     @SuppressWarnings("finally")
-    public static File downloadFile(String urlPath, String downloadDir, String filename, String method, List<HashMap<String, String>> proxy) {
+    public static File downloadFile(String urlPath, String downloadDir, String filename, String method,
+                                    List<HashMap<String, String>> proxy,String cookies) {
         File file = null;
         try {
 
@@ -59,6 +67,10 @@ public class FileUrlDownloadUtil {
             httpURLConnection.setRequestMethod(method);
             // 设置字符编码
             httpURLConnection.setRequestProperty("Charset", "UTF-8");
+            if (!cookies.equals("")){
+                httpURLConnection.setRequestProperty("Cookie", cookies);
+            }
+
             // 打开到此 URL引用的资源的通信链接（如果尚未建立这样的连接）。
             httpURLConnection.connect();
             // 文件大小
@@ -116,36 +128,6 @@ public class FileUrlDownloadUtil {
     }
 
     /**
-     * 测试
-     *
-     * @param args
-     */
-    public static void main(String[] args) {
-
-//        downloadFile("http://pic.ibaotu.com/mp3Watermark_v3/19/45/81/90b6614d19ec063b643edf92682d3f55.mp3",
-//                "F:/",
-//                "aaaa.mp3",
-//                "GET");
-//
-//        String s = ":阿的说法\\\\/.&*(阿斯蒂芬阿萨德()/*`~?<|第三发送方式{:。}>-,';][=-!#$%^&*+@\\水电费第三方分";
-//        s = s.replaceAll("[\\pP\\p{Punct}]", "");
-//        System.out.println(s);
-//        HashSet<String> urls = HttpRequest.getAcidsFromUser("https://www.acfun.cn/space/next?uid=11039293&type=video&orderBy=2&pageNo=",1);
-//
-//        for(String url:urls){
-//            System.out.println(url);
-//        }
-
-        try {
-            getALLProxies("proxy.txt").forEach(a -> {
-                System.out.println(a.get("ip") + ":" + a.get("port"));
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
      * 说明：根据指定URL将文件下载到指定目标位置
      *
      * @param filePath proxy文件路径
@@ -170,5 +152,52 @@ public class FileUrlDownloadUtil {
 
         }
         return proxies;
+    }
+
+    public static List<String> getHeaders(String filePath) throws IOException {
+        List<String> headers= new LinkedList<>();
+        File file = new File(filePath);
+        if (!file.exists()) {
+            file.createNewFile();
+            return headers;
+        }
+        BufferedReader br = new BufferedReader(new FileReader(file));
+        String str = null;
+        while ((str = br.readLine()) != null) {
+            if (!str.startsWith("#") && !str.equals("")) {
+                headers.add(str);
+            }
+        }
+        return headers;
+    }
+
+    /**
+     * 测试
+     *
+     * @param args
+     */
+    public static void main(String[] args) {
+
+//        downloadFile("http://pic.ibaotu.com/mp3Watermark_v3/19/45/81/90b6614d19ec063b643edf92682d3f55.mp3",
+//                "F:/",
+//                "aaaa.mp3",
+//                "GET");
+
+//        String s = ":阿的说法\\\\/.&*(阿斯蒂芬阿萨德()/*`~?<|第三发送方式{:。}>-,';][=-!#$%^&*+@\\水电费第三方分";
+//        s = s.replaceAll("[\\pP\\p{Punct}]", "");
+//        System.out.println(s);
+//        HashSet<String> urls = HttpRequest.getAcidsFromUser("https://www.acfun.cn/space/next?uid=11039293&type=video&orderBy=2&pageNo=",1);
+//
+//        for(String url:urls){
+//            System.out.println(url);
+//        }
+
+        try {
+            getHeaders("headers.txt").forEach(a -> {
+                System.out.println(a.split(":")[0]+":"+a.split(":")[1]);
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

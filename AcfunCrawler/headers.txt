@@ -1,0 +1,14 @@
+#按照这样的规则添加代理，#注释。
+#127.0.0.1:8081
+#127.0.0.1:8082
+#Accept: application/json
+#Accept-Encoding: gzip, deflate, br
+#Accept-Language: zh-CN,zh;q=0.9
+#Connection: keep-alive
+#Content-Length: 249
+#Content-Type: application/json
+#Cookie: _uuid=0715C416-F92F-A735-DF6F-0F2BD783455047778infoc; buvid3=C9B613A0-3880-4608-A241-6AD5005980C2155822infoc; LIVE_BUVID=AUTO6515677694765891; sid=9ko0uxh4; CURRENT_FNVAL=16; stardustvideo=1; rpdid=|(kJ|u~YlY0J'ulY~~)muRY; im_notify_type_8960710=0; laboratory=1-1; DedeUserID=8960710; DedeUserID__ckMd5=981589d104b0b8cd; SESSDATA=86c82358%2C1599226669%2C7db74*31; bili_jct=cbe0b9313c383c280f27e4bbe42ca426; PVID=1; CURRENT_QUALITY=80; bp_t_offset_8960710=371785417260041514; INTVER=1
+#Host: cm.bilibili.com
+#Origin: https://www.bilibili.com
+#Referer: https://www.bilibili.com/
+#User-Agent: LogStatistic

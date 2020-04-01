@@ -89,9 +89,11 @@ public class ParsePageUtil {
 
         JSONArray tags = (JSONArray) jsonObj.get("tagList");
         ArrayList<String> tagList = new ArrayList<String>();
+        if (tags!=null){
         for (Object tag : tags) {
             JSONObject t = (JSONObject) JSON.toJSON(tag);
             tagList.add(t.get("name").toString());
+        }
         }
 
         JSONArray videos = (JSONArray) jsonObj.get("videoList");
