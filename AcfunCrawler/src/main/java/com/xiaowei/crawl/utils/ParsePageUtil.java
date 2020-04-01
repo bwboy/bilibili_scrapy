@@ -5,9 +5,11 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPObject;
 import com.xiaowei.crawl.entity.VideoInfo;
+import com.xiaowei.crawl.factory.MySqlSessionFactory;
 import org.apache.http.util.TextUtils;
 
 import java.io.*;
+import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -80,6 +82,15 @@ public class ParsePageUtil {
 
         JSONArray representation = (JSONArray) adaptationSet.get("representation");
 
+        //额外需求
+        // 用户id
+        JSONObject user = (JSONObject) JSON.toJSON(jsonObj.get("user"));
+
+        // 分类
+        JSONObject channel = (JSONObject) JSON.toJSON(jsonObj.get("channel"));
+        String classes=channel.get("parentName").toString()+channel.get("name").toString();
+
+        //整理m3u8文件列表
         for (Object item : representation) {
             JSONObject json = (JSONObject) JSON.toJSON(item);
             String m3u8_url = (String) json.get("url");
@@ -87,6 +98,7 @@ public class ParsePageUtil {
             System.out.println(m3u8_url);
         }
 
+        //整理tag列表。
         JSONArray tags = (JSONArray) jsonObj.get("tagList");
         ArrayList<String> tagList = new ArrayList<String>();
         if (tags!=null){
@@ -96,9 +108,8 @@ public class ParsePageUtil {
         }
         }
 
+        //获取分p列表
         JSONArray videos = (JSONArray) jsonObj.get("videoList");
-
-
         List<JSONObject> videoList = new LinkedList<JSONObject>();
         for (Object video : videos) {
             JSONObject t = (JSONObject) JSON.toJSON(video);
@@ -110,6 +121,8 @@ public class ParsePageUtil {
         }
 
         VideoInfo videoInfo = new VideoInfo(jsonObj.get("title").toString(),
+                jsonObj.get("coverUrl").toString(),
+                currentVideoInfo.get("durationMillis").toString(),
                 jsonObj.get("shareCount").toString(),
                 jsonObj.get("danmakuCount").toString(),
                 jsonObj.get("viewCount").toString(),
@@ -117,15 +130,41 @@ public class ParsePageUtil {
                 jsonObj.get("likeCount").toString(),
                 jsonObj.get("giftPeachCount").toString(),
                 jsonObj.get("commentCount").toString(),
-                jsonObj.get("createTime").toString(),
+                jsonObj.get("createTimeMillis").toString(),
                 jsonObj.get("stowCount").toString(),
+                jsonObj.get("currentVideoId").toString(),
+                user.get("name").toString(),
+                classes,
                 videoList,
                 tagList,
-                m3u8_urls
+                m3u8_urls,
+                "F:/"
+
         );
 
 
         return videoInfo;
+    }
+
+    public static void saveDate(VideoInfo videoInfo){
+        StringBuilder tags = new StringBuilder();
+
+        if( videoInfo.tagList!=null&&!videoInfo.tagList.isEmpty()){
+            for (String a: videoInfo.tagList){
+                tags.append(a);
+            }
+        }else {
+            tags.append("----");
+        }
+
+        try {
+            MySqlSessionFactory.getInstance().addSqlToAcfunInfo(videoInfo.title,
+                    videoInfo.coverUrl,videoInfo.durationMillis,videoInfo.currentVideoId,videoInfo.viewCount,videoInfo.commentCount,
+                    videoInfo.user,videoInfo.bananaCount,videoInfo.createTimeMillis,videoInfo.likeCount,videoInfo.giftPeachCount,videoInfo.stowCount,videoInfo.shareCount,videoInfo.danmakuCount,tags.toString(),videoInfo.classes,"F:/");
+        } catch (SQLException e) {
+            System.out.println("数据库读写出现错误！");
+            e.printStackTrace();
+        }
     }
 
     /**

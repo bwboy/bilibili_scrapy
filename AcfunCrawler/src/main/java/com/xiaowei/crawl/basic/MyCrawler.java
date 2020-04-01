@@ -1,6 +1,7 @@
 package com.xiaowei.crawl.basic;
 
 import com.xiaowei.crawl.entity.VideoInfo;
+import com.xiaowei.crawl.factory.MySqlSessionFactory;
 import com.xiaowei.crawl.middleware.DownloadMiddleware;
 import com.xiaowei.crawl.utils.FileUrlDownloadUtil;
 import com.xiaowei.crawl.utils.HttpRequest;
@@ -75,6 +76,7 @@ public class MyCrawler {
                 e.printStackTrace();
             }
         }
+
         ExecutorService fixedThreadPool = Executors.newFixedThreadPool(MAX_THREAD);
         for (String url : urls) {
             fixedThreadPool.execute(new CrawlerThread(url, downloadDir, VIDEO_QUALITY, DownloadDelay, proxies, COOKIES));
@@ -93,7 +95,7 @@ public class MyCrawler {
             }
         }
 
-
+        MySqlSessionFactory.getInstance().close();
         System.out.println("主线程执行完毕！");
     }
 }
@@ -135,10 +137,13 @@ class CrawlerThread implements Runnable {
     @SneakyThrows
     public void run() {
         VideoInfo video = ParsePageUtil.getFileDownloadUrls(URL);
+
         final File file = new File(downloadDir + video.title.replaceAll("[\\pP\\p{Punct}]", ""));
         if (!file.exists()) {
             file.mkdir();
         }
+        video.fileContent=file.getPath();
+        ParsePageUtil.saveDate(video);
 
         //清晰度获取,目标视频清晰度可能不存在。于是降级。
         int QUALITY=VIDEO_QUALITY;
@@ -165,12 +170,16 @@ class CrawlerThread implements Runnable {
                 e.printStackTrace();
             }
         }
+        String fileName;
         if (!URL.contains("_")) {
-            ParsePageUtil.mergeDownloadFiles(file.getPath(), video.getVideoList().get(0).get("title").toString().replaceAll("[\\pP\\p{Punct}]", "_") + ".mp4");
+            fileName=video.getVideoList().get(0).get("title").toString().replaceAll("[\\pP\\p{Punct}]", "_") + ".mp4";
+            ParsePageUtil.mergeDownloadFiles(file.getPath(),fileName );
         } else {
             int p = Integer.parseInt(URL.split("_")[1]) - 1;
-            ParsePageUtil.mergeDownloadFiles(file.getPath(), video.getVideoList().get(p).get("title").toString().replaceAll("[\\pP\\p{Punct}]", "_") + ".mp4");
+            fileName=video.getVideoList().get(p).get("title").toString().replaceAll("[\\pP\\p{Punct}]", "_") + ".mp4";
+            ParsePageUtil.mergeDownloadFiles(file.getPath(), fileName);
         }
+
         Thread.sleep(DownloadDelay);
         if (video.videoList.size() >= 2 && !URL.contains("_")) {
             for (int i = 2; i <= video.videoList.size(); i++) {

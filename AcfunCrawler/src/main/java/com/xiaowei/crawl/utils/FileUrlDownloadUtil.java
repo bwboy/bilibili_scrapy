@@ -117,7 +117,9 @@ public class FileUrlDownloadUtil {
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-            System.out.println("文件下载失败！");
+            System.out.println("文件下载失败！"+filename);
+            downloadRetry( urlPath,  downloadDir,  filename,  method,
+                    proxy, cookies);
         } catch (Exception e) {
             System.out.println("出现错误");
             System.out.println(e);
@@ -125,6 +127,23 @@ public class FileUrlDownloadUtil {
             return file;
         }
 
+    }
+
+    public static void downloadRetry(String urlPath, String downloadDir, String filename, String method,
+                              List<HashMap<String, String>> proxy,String cookies){
+        int i=0;
+        while (i<5){
+            try {
+                downloadFile( urlPath,  downloadDir,  filename,  method,
+                        proxy, cookies);
+                System.out.println("文件重试成功！"+filename);
+                break;
+            }catch (Exception e){
+                System.out.println("第一次重试失败！");
+            }
+            i++;
+        }
+        System.out.println("重试失败！");
     }
 
     /**
