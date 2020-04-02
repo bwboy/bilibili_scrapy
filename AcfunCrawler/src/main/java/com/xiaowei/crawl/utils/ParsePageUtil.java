@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPObject;
 import com.xiaowei.crawl.entity.VideoInfo;
+import com.xiaowei.crawl.factory.LoggingFactory;
 import com.xiaowei.crawl.factory.MySqlSessionFactory;
 import org.apache.http.util.TextUtils;
 
@@ -88,7 +89,7 @@ public class ParsePageUtil {
 
         // 分类
         JSONObject channel = (JSONObject) JSON.toJSON(jsonObj.get("channel"));
-        String classes=channel.get("parentName").toString()+channel.get("name").toString();
+        String classes = channel.get("parentName").toString() + channel.get("name").toString();
 
         //整理m3u8文件列表
         for (Object item : representation) {
@@ -101,11 +102,11 @@ public class ParsePageUtil {
         //整理tag列表。
         JSONArray tags = (JSONArray) jsonObj.get("tagList");
         ArrayList<String> tagList = new ArrayList<String>();
-        if (tags!=null){
-        for (Object tag : tags) {
-            JSONObject t = (JSONObject) JSON.toJSON(tag);
-            tagList.add(t.get("name").toString());
-        }
+        if (tags != null) {
+            for (Object tag : tags) {
+                JSONObject t = (JSONObject) JSON.toJSON(tag);
+                tagList.add(t.get("name").toString());
+            }
         }
 
         //获取分p列表
@@ -146,21 +147,21 @@ public class ParsePageUtil {
         return videoInfo;
     }
 
-    public static void saveDate(VideoInfo videoInfo){
+    public static void saveDate(VideoInfo videoInfo) {
         StringBuilder tags = new StringBuilder();
 
-        if( videoInfo.tagList!=null&&!videoInfo.tagList.isEmpty()){
-            for (String a: videoInfo.tagList){
+        if (videoInfo.tagList != null && !videoInfo.tagList.isEmpty()) {
+            for (String a : videoInfo.tagList) {
                 tags.append(a);
             }
-        }else {
+        } else {
             tags.append("----");
         }
 
         try {
             MySqlSessionFactory.getInstance().addSqlToAcfunInfo(videoInfo.title,
-                    videoInfo.coverUrl,videoInfo.durationMillis,videoInfo.currentVideoId,videoInfo.viewCount,videoInfo.commentCount,
-                    videoInfo.user,videoInfo.bananaCount,videoInfo.createTimeMillis,videoInfo.likeCount,videoInfo.giftPeachCount,videoInfo.stowCount,videoInfo.shareCount,videoInfo.danmakuCount,tags.toString(),videoInfo.classes,"F:/");
+                    videoInfo.coverUrl, videoInfo.durationMillis, videoInfo.currentVideoId, videoInfo.viewCount, videoInfo.commentCount,
+                    videoInfo.user, videoInfo.bananaCount, videoInfo.createTimeMillis, videoInfo.likeCount, videoInfo.giftPeachCount, videoInfo.stowCount, videoInfo.shareCount, videoInfo.danmakuCount, tags.toString(), videoInfo.classes, "F:/");
         } catch (SQLException e) {
             System.out.println("数据库读写出现错误！");
             e.printStackTrace();
@@ -194,6 +195,7 @@ public class ParsePageUtil {
         if (!success) {
             System.out.println("视频合并失败！");
         }
+        LoggingFactory.warning("视频合并完成;" + fullName);
         System.out.println("视频合并完成;" + fullName);
     }
 
@@ -221,6 +223,9 @@ public class ParsePageUtil {
         }
 
         File resultFile = new File(resultPath);
+        if(resultFile.exists()){
+            return true;
+        }
 
         try {
             int bufSize = 1024;

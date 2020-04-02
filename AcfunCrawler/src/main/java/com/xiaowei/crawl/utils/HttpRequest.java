@@ -5,15 +5,15 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.io.Files;
+import com.xiaowei.crawl.basic.MyCrawler;
 
 
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -214,6 +214,51 @@ public class HttpRequest {
 
 //        HashSet<String> a =new HashSet<String>();
 //        a=HttpRequest.getAcids("https://www.acfun.cn/rest/pc-direct/rank/channel?channelId=&subChannelId=&rankLimit=30&rankPeriod=DAY");
+
+//        ExecutorService threadPool = new ThreadPoolExecutor(3,
+//                5,
+//                3,
+//                TimeUnit.SECONDS,
+//                new LinkedBlockingDeque<>(50),
+//                Executors.defaultThreadFactory(),
+//                new ThreadPoolExecutor.CallerRunsPolicy());
+//        for (int i = 0; i < 5; i++) {
+//            threadPool.execute(() -> {
+//                try {
+//                    TimeUnit.SECONDS.sleep(3);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//                System.out.println("执行完成"+Thread.currentThread().getName());
+//            });
+//        }
+
+//        Properties properties= null;
+//        try {
+//            properties = MyCrawler.getPropertys("");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        // 获取key对应的value值
+//        properties.getProperty("downloadDir");
+//
+//        System.out.println("a"+ properties.getProperty("COOKIES")+"b");
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
+        ConcurrentHashMap<String,String> a=new ConcurrentHashMap<>();
+
+        CopyOnWriteArrayList<String> b = new CopyOnWriteArrayList<>();
+
+        for (int i = 0; i <100 ; i++) {
+            new Thread(()->{
+                b.add(df.format(new Date())+"aaaaaa");
+            }).start();
+        }
+
+        b.forEach(s->{
+            System.out.println(s+"");
+        });
 
     }
 }

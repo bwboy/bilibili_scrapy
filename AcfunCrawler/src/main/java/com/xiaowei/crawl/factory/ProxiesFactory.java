@@ -26,14 +26,13 @@ public class ProxiesFactory {
     }
 
 
-    private static ProxiesFactory instance;
+    private volatile static ProxiesFactory instance;
 
-    //1.构造方法私有化
+
     private ProxiesFactory() {
 
     }
 
-    //2.提供一个全局访问点 加锁后
     public static ProxiesFactory getInstance() {
         if (instance == null) {
             synchronized (ProxiesFactory.class) {

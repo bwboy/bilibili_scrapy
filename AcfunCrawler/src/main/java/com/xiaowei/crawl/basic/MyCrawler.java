@@ -1,6 +1,7 @@
 package com.xiaowei.crawl.basic;
 
 import com.xiaowei.crawl.entity.VideoInfo;
+import com.xiaowei.crawl.factory.LoggingFactory;
 import com.xiaowei.crawl.factory.MySqlSessionFactory;
 import com.xiaowei.crawl.middleware.DownloadMiddleware;
 import com.xiaowei.crawl.utils.FileUrlDownloadUtil;
@@ -8,14 +9,9 @@ import com.xiaowei.crawl.utils.HttpRequest;
 import com.xiaowei.crawl.utils.ParsePageUtil;
 import lombok.SneakyThrows;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.io.*;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.regex.Pattern;
 
 /**
@@ -26,19 +22,23 @@ import java.util.regex.Pattern;
  * Desc:
  */
 public class MyCrawler {
-    public static void main(String[] args) {
-        String downloadDir = "F:/study_project/webpack/scrapy/acfun_video/";  //注意一定加上/
+    public static void main(String[] args) throws IOException {
+        Properties properties=getPropertys("");
+        LoggingFactory logger=LoggingFactory.getInstance();
 
-        int VIDEO_QUALITY = 3;  //0是最高.3是最低。
-        int userId = 0;  //输入用户id爬取全部视频。默认为0
 
-        int DownloadDelay = 1000;     //每次下载休息1s
-        int MAX_THREAD = 5;           //最大线程
+        String downloadDir = properties.getProperty("downloadDir").endsWith("/")?properties.getProperty("downloadDir"):properties.getProperty("downloadDir")+"/";  //注意一定加上/
 
-        boolean USE_PROXIES = false;  //使用代理,在根目录的proxy.txt添加代理。按照规则添加
-        boolean USE_HEADERS=false;
+        int VIDEO_QUALITY = Integer.parseInt(properties.getProperty("VIDEO_QUALITY"));  //0是最高.3是最低。
+        int userId = Integer.parseInt(properties.getProperty("userId"));  //输入用户id爬取全部视频。默认为0
 
-        String COOKIES = ""; //使用cookies 格式bili_jct=cbe0b9313c383c280f27e4bbe42ca426; PVID=1; CURRENT_QUALITY=80; bp_t_offset_8960710=371785417260041514; INTVER=1
+        int DownloadDelay = Integer.parseInt(properties.getProperty("DownloadDelay"));     //每次下载休息1s
+        int MAX_THREAD = Integer.parseInt(properties.getProperty("MAX_THREAD"));           //最大线程
+
+        boolean USE_PROXIES = Boolean.parseBoolean(properties.getProperty("USE_PROXIES"));   //使用代理,在根目录的proxy.txt添加代理。按照规则添加
+        boolean USE_HEADERS = Boolean.parseBoolean(properties.getProperty("USE_HEADERS")); ;
+
+        String COOKIES = properties.getProperty("COOKIES");  //使用cookies 格式bili_jct=cbe0b9313c383c280f27e4bbe42ca426; PVID=1; CURRENT_QUALITY=80; bp_t_offset_8960710=371785417260041514; INTVER=1
 
         /**
          * @Varb urls 是一个acid(https://www.acfun.cn/v/ac14297460)的列表集合。
@@ -60,7 +60,7 @@ public class MyCrawler {
 
 
         List<HashMap<String, String>> proxies = new LinkedList<HashMap<String, String>>();
-        LinkedList<HashMap<String, String>> headers= new LinkedList<>();
+        LinkedList<HashMap<String, String>> headers = new LinkedList<>();
 
         if (!USE_PROXIES) {
             try {
@@ -77,17 +77,26 @@ public class MyCrawler {
             }
         }
 
-        ExecutorService fixedThreadPool = Executors.newFixedThreadPool(MAX_THREAD);
+        if (urls.size()>256){
+            System.out.println("要下载的视频大于256个，任务队列会被占满！");
+        }
+        ExecutorService threadPool = new ThreadPoolExecutor(3,
+                MAX_THREAD,
+                3,
+                TimeUnit.SECONDS,
+                new LinkedBlockingDeque<>(256),
+                Executors.defaultThreadFactory(),
+                new ThreadPoolExecutor.CallerRunsPolicy());
         for (String url : urls) {
-            fixedThreadPool.execute(new CrawlerThread(url, downloadDir, VIDEO_QUALITY, DownloadDelay, proxies, COOKIES));
+            threadPool.execute(new CrawlerThread(url, downloadDir, VIDEO_QUALITY, DownloadDelay, proxies, COOKIES));
             try {
                 Thread.sleep(DownloadDelay);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-        fixedThreadPool.shutdown();
-        while (!fixedThreadPool.isTerminated()) {
+        threadPool.shutdown();
+        while (!threadPool.isTerminated()) {
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException e) {
@@ -96,7 +105,31 @@ public class MyCrawler {
         }
 
         MySqlSessionFactory.getInstance().close();
+        logger.close();
         System.out.println("主线程执行完毕！");
+    }
+
+    public   static Properties getPropertys(String fileName)  throws IOException {
+        String file=fileName.equals("")?"config.properties":fileName;
+        Properties properties = new Properties();
+        // 使用InPutStream流读取properties文件
+        File propFile=new File(file);
+        if (!propFile.exists()){
+            propFile.createNewFile();
+            FileWriter fw=new FileWriter(propFile);
+            fw.write("downloadDir=F:/study_project/webpack/scrapy/acfun_video/\r\n");
+            fw.write("VIDEO_QUALITY=3\r\n");
+            fw.write("userId=0\r\n");
+            fw.write("DownloadDelay=1000\r\n");
+            fw.write("MAX_THREAD=5\r\n");
+            fw.write("USE_PROXIES=false\r\n");
+            fw.write("USE_HEADERS=false\r\n");
+            fw.write("COOKIES=\r\n");
+            fw.close();
+        }
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(propFile));
+        properties.load(bufferedReader);
+        return  properties;
     }
 }
 
@@ -107,7 +140,13 @@ class CrawlerThread implements Runnable {
     int VIDEO_QUALITY;
     int DownloadDelay;
     List<HashMap<String, String>> proxies = new LinkedList<HashMap<String, String>>();
-    ExecutorService fixedThreadPool = Executors.newFixedThreadPool(5);
+    ExecutorService threadPool = new ThreadPoolExecutor(3,
+            5,
+            3,
+            TimeUnit.SECONDS,
+            new LinkedBlockingDeque<>(256),
+            Executors.defaultThreadFactory(),
+            new ThreadPoolExecutor.CallerRunsPolicy());
     String cookies;
 
 
@@ -142,12 +181,12 @@ class CrawlerThread implements Runnable {
         if (!file.exists()) {
             file.mkdir();
         }
-        video.fileContent=file.getPath();
+        video.fileContent = file.getPath();
         ParsePageUtil.saveDate(video);
 
         //清晰度获取,目标视频清晰度可能不存在。于是降级。
-        int QUALITY=VIDEO_QUALITY;
-        while (QUALITY>=video.getUrls().size()){
+        int QUALITY = VIDEO_QUALITY;
+        while (QUALITY >= video.getUrls().size()) {
             QUALITY--;
         }
         String url = video.getUrls().get(QUALITY);
@@ -172,21 +211,21 @@ class CrawlerThread implements Runnable {
         }
         String fileName;
         if (!URL.contains("_")) {
-            fileName=video.getVideoList().get(0).get("title").toString().replaceAll("[\\pP\\p{Punct}]", "_") + ".mp4";
-            ParsePageUtil.mergeDownloadFiles(file.getPath(),fileName );
+            fileName = video.getVideoList().get(0).get("title").toString().replaceAll("[\\pP\\p{Punct}]", "_") + ".mp4";
+            ParsePageUtil.mergeDownloadFiles(file.getPath(), fileName);
         } else {
             int p = Integer.parseInt(URL.split("_")[1]) - 1;
-            fileName=video.getVideoList().get(p).get("title").toString().replaceAll("[\\pP\\p{Punct}]", "_") + ".mp4";
+            fileName = video.getVideoList().get(p).get("title").toString().replaceAll("[\\pP\\p{Punct}]", "_") + ".mp4";
             ParsePageUtil.mergeDownloadFiles(file.getPath(), fileName);
         }
 
         Thread.sleep(DownloadDelay);
         if (video.videoList.size() >= 2 && !URL.contains("_")) {
             for (int i = 2; i <= video.videoList.size(); i++) {
-                fixedThreadPool.execute(new CrawlerThread(this.URL + "_" + i, this.downloadDir, this.VIDEO_QUALITY, this.DownloadDelay, this.proxies, cookies));
+                threadPool.execute(new CrawlerThread(this.URL + "_" + i, this.downloadDir, this.VIDEO_QUALITY, this.DownloadDelay, this.proxies, cookies));
             }
-            fixedThreadPool.shutdown();
-            while (!fixedThreadPool.isTerminated()) {
+            threadPool.shutdown();
+            while (!threadPool.isTerminated()) {
                 try {
                     Thread.sleep(5000);
                 } catch (InterruptedException e) {

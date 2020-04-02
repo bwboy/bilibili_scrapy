@@ -2,6 +2,7 @@ package com.xiaowei.crawl.utils;
 
 
 import com.sun.xml.internal.ws.util.StringUtils;
+import com.xiaowei.crawl.factory.LoggingFactory;
 import com.xiaowei.crawl.factory.ProxiesFactory;
 
 import java.io.*;
@@ -11,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class FileUrlDownloadUtil {
+
     /**
      * 说明：根据指定URL将文件下载到指定目标位置
      *
@@ -28,21 +30,21 @@ public class FileUrlDownloadUtil {
     @SuppressWarnings("finally")
     public static File downloadFile(String urlPath, String downloadDir, String filename, String method, String proxy) {
         List<HashMap<String, String>> proxies = new LinkedList<HashMap<String, String>>();
-        String cookies="";
-        if (proxy.contains(":")){
+        String cookies = "";
+        if (proxy.contains(":")) {
             HashMap<String, String> a = new HashMap<String, String>();
             a.put("ip", proxy.split(":")[0]);
             a.put("port", proxy.split(":")[1]);
             proxies.add(a);
-        }else {
-            cookies=proxy;
+        } else {
+            cookies = proxy;
         }
-        return downloadFile(urlPath, downloadDir, filename, method, proxies,cookies);
+        return downloadFile(urlPath, downloadDir, filename, method, proxies, cookies);
     }
 
     @SuppressWarnings("finally")
     public static File downloadFile(String urlPath, String downloadDir, String filename, String method,
-                                    List<HashMap<String, String>> proxy,String cookies) {
+                                    List<HashMap<String, String>> proxy, String cookies) {
         File file = null;
         try {
 
@@ -67,7 +69,7 @@ public class FileUrlDownloadUtil {
             httpURLConnection.setRequestMethod(method);
             // 设置字符编码
             httpURLConnection.setRequestProperty("Charset", "UTF-8");
-            if (!cookies.equals("")){
+            if (!cookies.equals("")) {
                 httpURLConnection.setRequestProperty("Cookie", cookies);
             }
 
@@ -77,7 +79,7 @@ public class FileUrlDownloadUtil {
             int fileLength = httpURLConnection.getContentLength();
 
             // 控制台打印文件大小
-            System.out.println("您要下载的文件大小为:" + fileLength / (1024 * 1024) + "MB");
+//            System.out.println("您要下载的文件大小为:" + fileLength / (1024 * 1024) + "MB");
 
             // 建立链接从请求中获取数据
             URLConnection con = url.openConnection();
@@ -92,6 +94,11 @@ public class FileUrlDownloadUtil {
             // 指定存放位置(有需求可以自定义)
             String path = downloadDir + File.separatorChar + fileFullName;
             file = new File(path);
+            if (file.exists()){
+                System.out.println("文件已存在！");
+                LoggingFactory.warning("文件已存在！"+path);
+                return file;
+            }
             // 校验文件夹目录是否存在，不存在就创建一个目录
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
@@ -110,19 +117,20 @@ public class FileUrlDownloadUtil {
             // 关闭资源
             bin.close();
             out.close();
-            System.out.println("文件下载成功！");
         } catch (MalformedURLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-            System.out.println("文件下载失败！"+filename);
-            downloadRetry( urlPath,  downloadDir,  filename,  method,
+            System.out.println("文件下载失败！" + filename);
+            LoggingFactory.warning("文件下载失败！" + filename);
+            downloadRetry(urlPath, downloadDir, filename, method,
                     proxy, cookies);
         } catch (Exception e) {
             System.out.println("出现错误");
             System.out.println(e);
+            LoggingFactory.warning("出现错误"+e);
         } finally {
             return file;
         }
@@ -130,20 +138,24 @@ public class FileUrlDownloadUtil {
     }
 
     public static void downloadRetry(String urlPath, String downloadDir, String filename, String method,
-                              List<HashMap<String, String>> proxy,String cookies){
-        int i=0;
-        while (i<5){
+                                     List<HashMap<String, String>> proxy, String cookies) {
+        int i = 0;
+        while (i < 5) {
             try {
-                downloadFile( urlPath,  downloadDir,  filename,  method,
+                downloadFile(urlPath, downloadDir, filename, method,
                         proxy, cookies);
-                System.out.println("文件重试成功！"+filename);
+                System.out.println("文件重试成功！" + filename);
+                LoggingFactory.warning("文件重试成功！" + filename);
+
                 break;
-            }catch (Exception e){
+            } catch (Exception e) {
                 System.out.println("第一次重试失败！");
+                LoggingFactory.warning("第一次重试失败！");
             }
             i++;
         }
         System.out.println("重试失败！");
+        LoggingFactory.warning("重试失败！");
     }
 
     /**
@@ -174,7 +186,7 @@ public class FileUrlDownloadUtil {
     }
 
     public static List<String> getHeaders(String filePath) throws IOException {
-        List<String> headers= new LinkedList<>();
+        List<String> headers = new LinkedList<>();
         File file = new File(filePath);
         if (!file.exists()) {
             file.createNewFile();
@@ -213,7 +225,7 @@ public class FileUrlDownloadUtil {
 
         try {
             getHeaders("headers.txt").forEach(a -> {
-                System.out.println(a.split(":")[0]+":"+a.split(":")[1]);
+                System.out.println(a.split(":")[0] + ":" + a.split(":")[1]);
             });
         } catch (IOException e) {
             e.printStackTrace();
