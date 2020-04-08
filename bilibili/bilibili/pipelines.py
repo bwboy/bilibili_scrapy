@@ -165,7 +165,7 @@ class RankingPipeline(object):
 
         # 下载视频封面图
         if not os.path.exists(os.path.join(spider.download_dir, 'bilibili_video', item['title'])):
-            os.mkdir(os.path.join(spider.download_dir, 'bilibili_video', item['title']))
+            os.makedirs(os.path.join(spider.download_dir, 'bilibili_video', item['title']))
         item["file_content"]=str(os.path.join(spider.download_dir, 'bilibili_video', item['title']))
         img_name=os.path.join(spider.download_dir, 'bilibili_video', item['title'],'{}'.format(item['img_url'].split('/')[-1]))
         img=self.executer.submit(self.download_img,item["img_url"],img_name)
