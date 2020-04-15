@@ -14,12 +14,24 @@ BOT_NAME = 'tudou'
 SPIDER_MODULES = ['tudou.spiders']
 NEWSPIDER_MODULE = 'tudou.spiders'
 
+# 下载位置
+DOWNLOAD_DIR=r"F:\study_project\webpack\scrapy\tudou_video"
+# selenium的chrome驱动位置
+WEBDRIVER_PATH=r'F:\study_project\webpack\SeleniumDemo\chromedriver.exe'
+# mysql配置
+MYSQL_CONFIG={"host":'127.0.0.1',
+            "port":3306,
+            "user":'wxwmodder',
+            "password":'sxmc321',
+            "db":'scrapy01'}
+# Mongo配置
+MONGO_CONFIG='mongodb://root:root@127.0.0.1:27017/admin'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'tudou (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
@@ -39,10 +51,10 @@ ROBOTSTXT_OBEY = True
 #TELNETCONSOLE_ENABLED = False
 
 # Override the default request headers:
-#DEFAULT_REQUEST_HEADERS = {
-#   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-#   'Accept-Language': 'en',
-#}
+DEFAULT_REQUEST_HEADERS = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36"
+
+}
 
 # Enable or disable spider middlewares
 # See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
@@ -52,9 +64,10 @@ ROBOTSTXT_OBEY = True
 
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
-#DOWNLOADER_MIDDLEWARES = {
+DOWNLOADER_MIDDLEWARES = {
 #    'tudou.middlewares.TudouDownloaderMiddleware': 543,
-#}
+      'tudou.middlewares.SeleniumInterceptMiddleware': 1,
+}
 
 # Enable or disable extensions
 # See https://docs.scrapy.org/en/latest/topics/extensions.html
@@ -64,9 +77,12 @@ ROBOTSTXT_OBEY = True
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
+ITEM_PIPELINES = {
 #    'tudou.pipelines.TudouPipeline': 300,
-#}
+   'tudou.pipelines.RankingPipeline': 50,
+#    'tudou.pipelines.MysqlPipeline': 51,
+#    'tudou.pipelines.MongoPipeline': 51,
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html

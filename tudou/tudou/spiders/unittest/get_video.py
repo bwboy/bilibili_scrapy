@@ -2,19 +2,31 @@ import requests
 import ssl
 import re,os,json
 
+
 from selenium import webdriver
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.chrome.options import Options    # 使用无头浏览器
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+desired_capabilities = DesiredCapabilities.CHROME
+desired_capabilities["pageLoadStrategy"] = "none"
 #初始化全局配置。
 chrome_options = Options()
-# chrome_options.add_argument("--headless")
-# chrome_options.add_argument("--disable-gpu")
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--disable-gpu")
 chrome_options.add_argument('User-Agent="Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36"')
 
 def get_first_url():
     addr="https://video.tudou.com/v/XNDQxOTgwODEyMA==.html?spm=a2h28.8313461.feed.dvideo"
     browser = webdriver.Chrome(r'F:\study_project\webpack\SeleniumDemo\chromedriver.exe',chrome_options=chrome_options)
-    browser.get(addr)
     browser.set_page_load_timeout(4)
+    
+
+    try:
+        browser.get(addr)
+    except TimeoutException as e:
+        print("加载页面太慢，停止加载，继续下一步操作")
+        browser.execute_script('window.stop()')
+
     url_list=[]
 
     for i in range(1,20):
@@ -26,7 +38,8 @@ def get_first_url():
         if "ups.youku.com/ups/get.json" in url:
             callback_url=url
             break
-    get_mp4_from_js(addr,callback_url)
+    print("callback地址：{}".format(callback_url))
+    # get_mp4_from_js(addr,callback_url)
 
 '''
 author:吴晓伟
@@ -58,6 +71,27 @@ def download_mp4(video_url,download_dir,video_title):
     f.close()
     print("视频下载完成:{}".format("{0}/{1}/{2}.mp4".format(download_dir,video_title,video_title)))
 
+
+def souhuo_download():  #video_url,headers,video_title
+    headers={
+        # 'Origin': 'https://tv.sohu.com',
+        # 'Referer': 'https://tv.sohu.com/v/MjAxNTAxMDUvbjQwNzU0MzI0My5zaHRtbA==.html?fid=784&pvid=4d4db6d26aa0a4ec',
+        # 'Sec-Fetch-Mode': 'no-cors',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36',
+    }
+    video_url="http://list.video.baidu.com/swf/ecomAdvPlayer.swf?tpl=coop&controls=progress,pause,volumn,fullscreen&video=http%3A%2F%2Fpgcvideo.cdn.xiaodutv.com%2F2938077641_1730706785_20190505183107.mp4%3FCache-Control%253Dmax-age%253A8640000%2526responseExpires%253DTue%252C_13_Aug_2019_18%253A31%253A46_GMT%3D%26xcode%3Debc73a2071fc3947f0436b82ce595ec8b7ae3f890d334781%26time%3D1586946112"
+    video_title="souhu_video"
+
+
+    response_stream=requests.get(url=video_url,stream=True,headers=headers)
+    if not os.path.exists(download_dir+'/{}'.format(video_title)):
+        os.makedirs(download_dir+'/{}'.format(video_title))
+    f = open("{0}/{1}/{2}.mp4".format(download_dir,video_title,video_title),'wb+')
+    for chunk in response_stream.iter_content(chunk_size=1024):# 每次下载5120，因为我的大点，我选择每次稍大一点，这个自己根据需要选择。
+        if chunk:
+            f.write(chunk)
+    f.close()
+    print("视频下载完成:{}".format("{0}/{1}/{2}.mp4".format(download_dir,video_title,video_title)))
 
 def start_url():
     m3u8 = 'http://pl-ali.youku.com/playlist/m3u8?vid=1136718237&type=hd2&ups_client_netip=015f221b&utid=CDT5FYlWrxcCAQFfOLjhX9s0&ccode=050F&psid=67448f6badcc1b83352616f7e12d4403&duration=233&expire=18000&drm_type=1&drm_device=7&dyt=1&ups_ts=1586236809&onOff=0&encr=0&ups_key=6d7fd981ab4189a466bf6f13f82c41d5'
@@ -158,11 +192,9 @@ if __name__ == "__main__":
     # get_tudou_video(url)
     # get_js_from_url()
     # get_mp4_from_js()
-    get_first_url()
+    # get_first_url()
 
-
-
-    
+    souhuo_download()
 
    
 

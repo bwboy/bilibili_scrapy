@@ -155,8 +155,10 @@ class RankingPipeline(object):
                 'Origin': 'https://www.bilibili.com',
                 'Connection': 'keep-alive',
         }
+        cookies="_uuid=0715C416-F92F-A735-DF6F-0F2BD783455047778infoc; buvid3=C9B613A0-3880-4608-A241-6AD5005980C2155822infoc; LIVE_BUVID=AUTO6515677694765891; sid=9ko0uxh4; CURRENT_FNVAL=16; stardustvideo=1; rpdid=|(kJ|u~YlY0J'ulY~~)muRY; im_notify_type_8960710=0; laboratory=1-1; DedeUserID=8960710; DedeUserID__ckMd5=981589d104b0b8cd; SESSDATA=86c82358%2C1599226669%2C7db74*31; bili_jct=cbe0b9313c383c280f27e4bbe42ca426; CURRENT_QUALITY=80; PVID=4; bp_t_offset_8960710=377193884892598175"
+        cookie_dict = {i.split("=")[0]:i.split("=")[-1] for i in cookies.split("; ")}
         detail_url='https://api.bilibili.com/x/player/playurl?cid={}&avid={}&qn={}'.format(item['cid'], item["avid"], spider.VIDEO_QUALITY)
-        jsonp=requests.get(url=detail_url,headers=headers).json()
+        jsonp=requests.get(url=detail_url,headers=headers,cookies=cookie_dict).json()
 
         # 获取视频列表，这个函数看看视频有多少段。
         video_list=[]
@@ -173,9 +175,11 @@ class RankingPipeline(object):
 
         # 判断视频是否包含分P，若包含则进行分P下载。
         if item['pages']>1:
+            logger.warning("---------------------------------------------------------")
             count=1
             for video_url in video_list:
                 filename=os.path.join(spider.download_dir, 'bilibili_video', item['title'],'{}-{}.flv'.format(item['part'],count))
+                logger.warning(filename)
                 video_download=self.executer.submit(self.download_video,video_url, filename, headers=headers)
                 self.threads_list.append(video_download)
                 count+=1
@@ -316,10 +320,12 @@ class DownloadVideoPipeline(object):
         url_api = 'https://api.bilibili.com/x/player/playurl?cid={}&avid={}&qn={}'.format(cid, aid, quality)
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
-            'Cookie': 'SESSDATA=aa15d6af%2C1560734457%2Ccc8ca251', # 登录B站后复制一下cookie中的SESSDATA字段,有效期1个月
+            # 'Cookie': 'SESSDATA=86c82358%2C1599226669%2C7db74*31', # 登录B站后复制一下cookie中的SESSDATA字段,有效期1个月
             'Host': 'api.bilibili.com'
         }
-        html = requests.get(url_api, headers=headers).json()
+        cookies="_uuid=0715C416-F92F-A735-DF6F-0F2BD783455047778infoc; buvid3=C9B613A0-3880-4608-A241-6AD5005980C2155822infoc; LIVE_BUVID=AUTO6515677694765891; sid=9ko0uxh4; CURRENT_FNVAL=16; stardustvideo=1; rpdid=|(kJ|u~YlY0J'ulY~~)muRY; im_notify_type_8960710=0; laboratory=1-1; DedeUserID=8960710; DedeUserID__ckMd5=981589d104b0b8cd; SESSDATA=86c82358%2C1599226669%2C7db74*31; bili_jct=cbe0b9313c383c280f27e4bbe42ca426; CURRENT_QUALITY=80; PVID=4; bp_t_offset_8960710=377193884892598175"
+        cookie_dict = {i.split("=")[0]:i.split("=")[-1] for i in cookies.split("; ")}
+        html = requests.get(url_api, headers=headers,cookies=cookie_dict).json()
         video_list = []
         for i in html['data']['durl']:
             video_list.append(i['url'])

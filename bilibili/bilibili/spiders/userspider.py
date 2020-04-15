@@ -23,7 +23,7 @@ class UserspiderSpider(scrapy.Spider):
 
     # 用户参数 
     # 下载视频列表。有多少个都放进去。
-    start_urls = ['https://www.bilibili.com/video/BV1ob411p7oc']
+    start_urls = ['https://www.bilibili.com/video/BV1me411W7J5']
     '''
     start_urls = ['https://www.bilibili.com/video/BV1d7411m78N',
     'https://www.bilibili.com/video/BV1kE411P7gx',
@@ -36,7 +36,7 @@ class UserspiderSpider(scrapy.Spider):
     userId=None         #'https://space.bilibili.com/883968/video' 
     target_count=5
     # 其他参数
-    VIDEO_QUALITY=16    #pipeline视频质量16 32 64 80 -> 360p 480p 720p 1080p
+    VIDEO_QUALITY=80    #pipeline视频质量16 32 64 80 -> 360p 480p 720p 1080p
     PROXIES_LIST=[]     #[{"http":"117.94.213.117:8118"},{"http":"127.0.0.1:8080"},{"http":"127.0.0.1:8080"},{"http":"127.0.0.1:8080"}]
 
 
@@ -108,7 +108,12 @@ class UserspiderSpider(scrapy.Spider):
         video_meta["classes"]=data['tname']
         video_meta["file_content"]=None
         video_meta["pages_list"]=data['pages']
-        video_meta["title"]=data['title']
+
+        # s = '*\/:?"<>|'
+        # str1 = '\巴拉<1"!11【】>1*hgn/p:?|'
+        #a = re.findall('[\u4e00-\u9fa5a-zA-Z0-9]+',str1,re.S)   #只要字符串中的中文，字母，数字
+        
+        video_meta["title"]="".join(re.findall('[\u4e00-\u9fa5a-zA-Z0-9]+',data['title'],re.S))
         video_meta['author']=data["owner"]['name']
         for video_item in video_meta['pages_list']:
             video_meta["pages"]=len(video_meta['pages_list'])

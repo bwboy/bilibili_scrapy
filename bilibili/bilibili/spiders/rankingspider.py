@@ -109,7 +109,7 @@ class RankingspiderSpider(scrapy.Spider):
         video_meta["classes"]=data['tname']
         video_meta["file_content"]="none"
         video_meta["pages_list"]=data['pages']
-        video_meta["title"]=data['title']
+        video_meta["title"]="".join(re.findall('[\u4e00-\u9fa5a-zA-Z0-9]+',data['title'],re.S))
         for video_item in video_meta['pages_list']:
             video_meta["pages"]=len(video_meta['pages_list'])
             video_meta["cid"]=video_item['cid']
@@ -158,3 +158,13 @@ class RankingspiderSpider(scrapy.Spider):
             print("不使用代理")
         
         
+
+if __name__ == "__main__":
+    import math
+
+    lists=[1,2,5,9,10]   # 被取对数的数组
+    lists2=[]            # 放到这里
+
+    for i in lists:
+        lists2.append( math.log( i ) ) #加入lists2
+          

@@ -10,7 +10,7 @@ from tudou import settings
 
 # 初始化全局配置。
 chrome_options = Options()
-chrome_options.add_argument("--headless")
+# chrome_options.add_argument("--headless")
 chrome_options.add_argument("--disable-gpu")
 # 针对Linux环境下的chrome driver参数
 chrome_options.add_argument('--no-sandbox')
@@ -24,7 +24,8 @@ chrome_options.add_argument('User-Agent="Mozilla/5.0 (Windows NT 10.0; WOW64) Ap
 logger=logging.getLogger()
 
 
-class Test01Spider(scrapy.Spider):
+class RankingSpider(scrapy.Spider):
+
     # 爬取多少个视频
     COUNT=5
     # 排行榜(分类位置)
@@ -32,16 +33,22 @@ class Test01Spider(scrapy.Spider):
     # 最大线程
     MAX_THREADS=5
 
-    name = 'test01'
+    # 代理列表  [{"http":"117.94.213.117:8118"},{"http":"127.0.0.1:8080"},{"http":"127.0.0.1:8080"},{"http":"127.0.0.1:8080"}]
+    PROXIES_LIST=[] 
+
+    name = 'ranking'
     allowed_domains = ['tudou.com','youku.com']
+    # start_urls = ['http://tudou.com/']
     DOWNLOAD_DIR=settings.DOWNLOAD_DIR
     WEBDRIVER_PATH=settings.WEBDRIVER_PATH
     def __init__(self):
         # 填写并检查初始化参数
         try:
             self.check_param()
+            
         except:
             logger.warning("输入参数有误，已返回默认值。")
+        self.getProxiesList() # 装载代理
         self.browser = webdriver.Chrome(self.WEBDRIVER_PATH,chrome_options=chrome_options)
         self.browser.implicitly_wait(5)
         super().__init__()
@@ -100,6 +107,14 @@ class Test01Spider(scrapy.Spider):
             self.browser.quit()
         print("爬虫已关闭！")
 
+    def getProxiesList(self):
+        try:
+            with open("proxy.txt","r",encoding="utf-8") as f:
+                json_str=f.read()
+            proxy_list=eval(json_str)
+            [self.PROXIES_LIST.append(i) for i in proxy_list]
+        except:
+            print("不使用代理")
 
     def check_param(self):
         target_url =input('请填写排行榜分类地址（默认音乐分类）：')

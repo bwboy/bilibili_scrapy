@@ -8,7 +8,7 @@ desc：用于测试下载流视频可行性的代码片段。完全使用面向�
 '''
 
 download_dir=r'F:/study_project/webpack/scrapy'
-url='https://www.bilibili.com/video/BV1h7411R7ne'
+url='https://www.bilibili.com/video/BV1me411W7J5'
 
 
 headers_list = {
@@ -60,16 +60,20 @@ def get_cid():
     pages=res['data']['pages']
     author=res['data']['owner']['name']
     video_title=res['data']['title']
-    quality=64
+    quality=112
     print('|----下载的cid:{}'.format(res['data']['cid']))
     print('|----下载的共有分P数量:{}'.format(len(pages)))
     url_api = 'https://api.bilibili.com/x/player/playurl?cid={}&avid={}&qn={}'.format(cid, aid, quality)
-    res=requests.get(url=url_api,headers=header_download).json()
+    cookies="_uuid=0715C416-F92F-A735-DF6F-0F2BD783455047778infoc; buvid3=C9B613A0-3880-4608-A241-6AD5005980C2155822infoc; LIVE_BUVID=AUTO6515677694765891; sid=9ko0uxh4; CURRENT_FNVAL=16; stardustvideo=1; rpdid=|(kJ|u~YlY0J'ulY~~)muRY; im_notify_type_8960710=0; laboratory=1-1; DedeUserID=8960710; DedeUserID__ckMd5=981589d104b0b8cd; SESSDATA=86c82358%2C1599226669%2C7db74*31; bili_jct=cbe0b9313c383c280f27e4bbe42ca426; CURRENT_QUALITY=80; PVID=4; bp_t_offset_8960710=377193884892598175"
+    cookie_dict = {i.split("=")[0]:i.split("=")[-1] for i in cookies.split("; ")}
+    res=requests.get(url=url_api,headers=header_download,cookies=cookie_dict).json()
     video_list=[]
     for item in res['data']['durl']:
         video_list.append(item['url'])
     #print('|----下载的url_cid:{}'.format(start_url))
-    print('|----下载的url_cid:{}'.format(res_aid))
+    # print('|----下载的url_cid:{}'.format(res_aid))
+
+    print('|----下载的质量:{}'.format(res['data']['quality']))
 
     print('|----下载的url_list:{}'.format(url_api))
     print('|----列表长度:{}'.format(len(video_list)))
@@ -77,18 +81,18 @@ def get_cid():
     print('|----开始下载"{}"作者的视频"{}"'.format(author,video_title))
 
     
-    for video_url in video_list:
-        response_stream=requests.get(url=video_url,headers=header_download,stream=True)
+    # for video_url in video_list:
+    #     response_stream=requests.get(url=video_url,headers=header_download,stream=True)
 
-        if not os.path.exists(download_dir+'/{}'.format(video_title)):
-            os.mkdir(download_dir+'/{}'.format(video_title))
-        download_img(img_pic,download_dir,video_title)
-        download_video(video_url,header_download,download_dir,video_title)
-        with open("{}/{}/{}.mp4".format(download_dir,video_title,video_title),'wb+') as f:
-            f.write(response_stream.content)
+    #     if not os.path.exists(download_dir+'/{}'.format(video_title)):
+    #         os.mkdir(download_dir+'/{}'.format(video_title))
+    #     download_img(img_pic,download_dir,video_title)
+    #     download_video(video_url,header_download,download_dir,video_title)
+    #     with open("{}/{}/{}.mp4".format(download_dir,video_title,video_title),'wb+') as f:
+    #         f.write(response_stream.content)
   
 
-    print("下载完成：{}".format(video_title))
+    # print("下载完成：{}".format(video_title))
 
 ''' 测试requests 分段下载视频数据 每个数据块1024 '''
 def download_video(video_url,header_download,download_dir,video_title):
@@ -130,6 +134,6 @@ if __name__ == "__main__":
     # "每天一遍"
 
     # )
-    #get_cid()
+    get_cid()
     #aaaa()
     # jsontest()

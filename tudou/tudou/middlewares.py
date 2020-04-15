@@ -4,8 +4,35 @@
 #
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
-
 from scrapy import signals
+
+import hashlib,time
+from scrapy.http import HtmlResponse
+from twisted.internet import defer, threads
+import threading
+from selenium.common.exceptions import TimeoutException
+from concurrent.futures import ThreadPoolExecutor, wait, ALL_COMPLETED, FIRST_COMPLETED
+import queue,json,os
+
+
+class SeleniumInterceptMiddleware(object):
+    #通过chrome请求动态网页
+    def process_request(self, request, spider):
+    	#这里的XXXX即为我们的爬虫名,对不同的爬虫进行动态的修改
+
+        if not  '.mp4' in request.url and not  '.m3u8' in request.url and not  'ups.youku.com/ups/get.json' in request.url:
+            spider.browser.get(request.url)
+            # time.sleep(5)
+
+            time.sleep(2)
+            spider.browser.execute_script("window.stop();")
+            # if ".top." in request.url:
+            #     spider.browser.find_element_by_xpath('//ul[@class="rank-tab"]/li[{}]'.format(spider.TARGET_CLASS)).click()
+            print('访问：{}'.format(request.url))
+            #这里直接retrun HtmlResponse的原因是我们已经通过模拟浏览器的方式访问过一遍网站了 不需要再次进入downloader下载一次所以直接return就好了
+            return HtmlResponse(url=spider.browser.current_url,body=spider.browser.page_source,encoding='utf-8')
+        else:
+            print("获取到了一个视频下载地址："+request.url)
 
 
 class TudouSpiderMiddleware(object):
