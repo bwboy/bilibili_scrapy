@@ -9,7 +9,7 @@ from concurrent.futures import ThreadPoolExecutor, wait, ALL_COMPLETED, FIRST_CO
 
 from pymongo import MongoClient
 from pymysql import connect
-from tudou import settings
+from baidu import settings
 import requests
 import logging
 logger=logging.getLogger()
@@ -19,21 +19,17 @@ from concurrent.futures import ThreadPoolExecutor, wait, ALL_COMPLETED, FIRST_CO
 import os, time, re,random
 
 lock=Lock()
-# import queue
 
-class TudouPipeline(object):
+class BaiduPipeline(object):
     def process_item(self, item, spider):
         return item
 
 
 class RankingPipeline(object):
-    LOGGING=[]
     logfile=None
     threads_list=[]
     executer=None
     
-    
-
     def open_spider(self,spider):
         self.executer=ThreadPoolExecutor(spider.MAX_THREADS)
         self.PROXIES_LIST=spider.PROXIES_LIST
@@ -110,6 +106,8 @@ class RankingPipeline(object):
         lock.release()
 
 
+
+
 '''
 当启用mysql时每条数据蒋经过此类处理。
 '''
@@ -132,7 +130,7 @@ class MysqlPipeline(object):
             item["img_src"],
             item["stream_url"],
         ]
-        sql2='insert into tudou_info VALUES(0,%s,%s,%s,%s)'
+        sql2='insert into baidu_info VALUES(0,%s,%s,%s,%s)'
         self.client.commit()
         return item
 
@@ -148,7 +146,7 @@ class MongoPipeline(object):
         self.client=MongoClient(url)
 
     def process_item(self, item, spider):
-        self.client.tudou.video.insert_one(item)
+        self.client.baidu.video.insert_one(item)
         return item
 
     def close_spider(self,spider):
