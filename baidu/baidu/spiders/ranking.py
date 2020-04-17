@@ -17,7 +17,7 @@ class RankingSpider(scrapy.Spider):
     # 最大线程
     MAX_THREADS=5
     # 下载个数
-    COUNT=3
+    COUNT=5
     # 代理列表
     PROXIES_LIST=[] 
     name = 'ranking'
@@ -71,7 +71,7 @@ class RankingSpider(scrapy.Spider):
         video_item['title']=title
         video_item['name']="".join(re.findall('[\u4e00-\u9fa5a-zA-Z0-9]+',title,re.S))
         video_item['author']=author
-        video_item['hot']="".join(hot)
+        video_item['hot']="".join(hot).strip()
         video_item['stream_url']=stream_url
 
         yield video_item

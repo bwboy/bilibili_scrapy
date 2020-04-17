@@ -81,7 +81,9 @@ ROBOTSTXT_OBEY = False
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
 #    'baidu.pipelines.BaiduPipeline': 300,
-   'baidu.pipelines.RankingPipeline': 300,
+   'baidu.pipelines.RankingPipeline': 100,
+#    'baidu.pipelines.MysqlPipeline': 101,
+#    'baidu.pipelines.MongoPipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

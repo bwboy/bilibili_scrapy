@@ -80,8 +80,8 @@ DOWNLOADER_MIDDLEWARES = {
 ITEM_PIPELINES = {
 #    'tudou.pipelines.TudouPipeline': 300,
    'tudou.pipelines.RankingPipeline': 50,
-#    'tudou.pipelines.MysqlPipeline': 51,
-#    'tudou.pipelines.MongoPipeline': 51,
+#    'tudou.pipelines.MysqlPipeline': 55,
+#    'tudou.pipelines.MongoPipeline': 60,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

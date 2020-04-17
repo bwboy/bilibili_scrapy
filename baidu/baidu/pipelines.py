@@ -44,6 +44,7 @@ class RankingPipeline(object):
         video_download=self.executer.submit(self.download_mp4,item['stream_url'],spider.DOWNLOAD_DIR,item['name'])
         self.threads_list.append(video_download)
         self.write_logging("{}:视频下载开始:{}/{}/{}.mp4".format(time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time())),spider.DOWNLOAD_DIR,item['name'],item['name']))
+        item['file_content']="{0}/{1}/{2}.mp4".format(spider.DOWNLOAD_DIR,item['name'],item['name'])
         return item
 
     def download_mp4(self,video_url,download_dir,video_title):
@@ -123,14 +124,19 @@ class MysqlPipeline(object):
         self.cursor=self.client.cursor()
 
     def process_item(self, item, spider):
-
         args=[
-            item["name"],
             item["title"],
-            item["img_src"],
+            item["author"],
+            item["hot"],
+            item["img_url"],
+
+            item["update_time"],
+            item["html_url"],
             item["stream_url"],
+            item["file_content"]
         ]
-        sql2='insert into baidu_info VALUES(0,%s,%s,%s,%s)'
+        sql='insert into baidu_info VALUES(0,%s,%s,%s,%s,%s,%s,%s,%s)'
+        self.cursor.execute(sql,args)
         self.client.commit()
         return item
 

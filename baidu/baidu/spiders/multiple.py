@@ -40,14 +40,18 @@ class MultipleSpider(scrapy.Spider):
         title=response.xpath('//div[@class="title-cont"]/h2/text()').extract_first()
         author=response.xpath('//p[@class="title-info"]/span[@class="site"]/text()').extract_first()
         hot=response.xpath('//p[@class="title-info"]/span[@class="num play"]/text()').extract()
+        update_time="" #response.xpath('//p[@class="title-info"]/span[@class="num play"]/text()').extract()
         stream_url=self.parse_html(response)
 
 
         video_item['title']=title
         video_item['name']="".join(re.findall('[\u4e00-\u9fa5a-zA-Z0-9]+',title,re.S))
         video_item['author']=author
-        video_item['hot']="".join(hot)
+        video_item['hot']="".join(hot).strip()
+        video_item['html_url']= response.url
         video_item['stream_url']=stream_url
+        video_item['update_time']=update_time
+        video_item["img_url"]=""
 
         yield video_item
 

@@ -30,6 +30,9 @@ class MultipleSpider(scrapy.Spider):
     'https://video.tudou.com/v/XNDUyMjc3NzgyMA==.html?spm=a2h28.8313461.feed.dvideo']
     # 最大线程
     MAX_THREADS=5
+    # 选择视频清晰度0、1、2、3["mp4sd","3gphd","mp4hd2v2","mp4hd"],可能没有其他格式。
+    VIDEO_QUALITY=1
+
 
     name = 'multiple'
     allowed_domains = ['tudou.com','youku.com']
@@ -49,7 +52,18 @@ class MultipleSpider(scrapy.Spider):
     def parse(self, response):
         video_meta=TudouItem()
         title=response.xpath('//*[@id="subtitle"]/text()').extract()
-        video_meta['title']= title
+        reply=response.xpath('//*[@id="allCommentNum"]/text()').extract()
+        author=response.xpath('//*[@id="play-container"]/div[2]/div[2]/div[2]/div[1]/div[1]/a/text()').extract()
+        update_time=response.xpath('//*[@id="play-container"]/div[2]/div[2]/div[2]/div[3]/div/div[1]/text()').extract()
+        
+        video_meta['title']="".join(title) 
+        video_meta['reply']="".join(reply) 
+        video_meta['author']="".join(author) 
+        video_meta['update_time']="".join(update_time)
+        video_meta['img_src']=""
+        video_meta['pageurl']=response.url
+
+        # 遍历script寻找视频流地址
         url_list=response.xpath('//html/head/script/@src')
         headers={
             # "Referer": video_meta['pageurl'],
@@ -74,7 +88,11 @@ class MultipleSpider(scrapy.Spider):
         stream=data['stream']
         mp4_list=[]
         for item in stream:
-            download_url=item['segs'][0]['cdn_url']
+            # 目标视频质量可能不存在
+            QUALITY=self.VIDEO_QUALITY
+            while len(item['segs'])-1<QUALITY:
+                QUALITY-=1
+            download_url=item['segs'][QUALITY]['cdn_url']
             mp4_list.append(download_url)
             print(download_url)
         video_meta['stream_url']=mp4_list[-1]

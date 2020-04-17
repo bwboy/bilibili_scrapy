@@ -27,12 +27,13 @@ logger=logging.getLogger()
 class RankingSpider(scrapy.Spider):
 
     # 爬取多少个视频
-    COUNT=5
+    COUNT=4
     # 排行榜(分类位置)
     start_urls = ['https://www.tudou.com/sec/622336449?spm=a2h28.8313461.top.dtab']
     # 最大线程
     MAX_THREADS=5
-
+    # 选择视频清晰度0、1、2、3["mp4sd","3gphd","mp4hd2v2","mp4hd"]
+    VIDEO_QUALITY=0
     # 代理列表  [{"http":"117.94.213.117:8118"},{"http":"127.0.0.1:8080"},{"http":"127.0.0.1:8080"},{"http":"127.0.0.1:8080"}]
     PROXIES_LIST=[] 
 
@@ -71,6 +72,16 @@ class RankingSpider(scrapy.Spider):
 
     def parse_detail(self,response):
         video_meta=response.meta['video_meta']
+
+        reply=response.xpath('//*[@id="allCommentNum"]/text()').extract()
+        author=response.xpath('//*[@id="play-container"]/div[2]/div[2]/div[2]/div[1]/div[1]/a/text()').extract()
+        update_time=response.xpath('//*[@id="play-container"]/div[2]/div[2]/div[2]/div[3]/div/div[1]/text()').extract()
+        
+        video_meta['reply']="".join(reply) 
+        video_meta['author']="".join(author) 
+        video_meta['update_time']="".join(update_time)
+        video_meta['img_src']=""
+
         url_list=response.xpath('//html/head/script/@src')
         headers={
             "Referer": video_meta['pageurl'],
@@ -95,7 +106,11 @@ class RankingSpider(scrapy.Spider):
         stream=data['stream']
         mp4_list=[]
         for item in stream:
-            download_url=item['segs'][0]['cdn_url']
+            # 目标视频质量可能不存在
+            QUALITY=self.VIDEO_QUALITY
+            while len(item['segs'])-1<QUALITY:
+                QUALITY-=1
+            download_url=item['segs'][QUALITY]['cdn_url']
             mp4_list.append(download_url)
             print(download_url)
         print(mp4_list[-1])
