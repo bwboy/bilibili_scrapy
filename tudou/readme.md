@@ -19,6 +19,7 @@
 	```cmd
 	scrapy crawl multiple
 	```
+	回车后根据提示输入或者不输入参数
 4. 此时就可以看到你所设置的目录中下载好的文件了。 
 
 # 配置说明
@@ -101,7 +102,22 @@ scrapy crawl ranking
 	print(mp4_list[-1])
 	```
 
-
+# 附录  
++ 数据库结构
+	```sql
+	CREATE TABLE `tudou_info` (
+	`id` int(11) NOT NULL AUTO_INCREMENT,
+	`title` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+	`reply` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+	`author` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+	`pub_time` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+	`file_content` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+	`img_url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+	`href` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+	`stream_url` text COLLATE utf8mb4_unicode_ci,
+	PRIMARY KEY (`id`)
+	) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+	```
 
 + 土豆解决方案-  需要下载m3u8，可直接下载视频。
 

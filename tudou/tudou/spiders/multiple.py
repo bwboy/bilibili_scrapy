@@ -40,11 +40,14 @@ class MultipleSpider(scrapy.Spider):
     WEBDRIVER_PATH=settings.WEBDRIVER_PATH
     def __init__(self):
         # 填写并检查初始化参数
-        # try:
-        #     self.check_param()
-        # except:
-        #     logger.warning("输入参数有误，已返回默认值。")
-        self.getProxiesList() # 装载代理
+        try:
+            self.check_param()
+        except:
+            logger.warning("输入参数有误，已返回默认值。")
+
+        # 装载代理
+        self.getProxiesList() 
+        # 实例化一个webdriver
         self.browser = webdriver.Chrome(self.WEBDRIVER_PATH,chrome_options=chrome_options)
         self.browser.implicitly_wait(5)
         super().__init__()
@@ -111,3 +114,20 @@ class MultipleSpider(scrapy.Spider):
             [self.PROXIES_LIST.append(i) for i in proxy_list]
         except:
             print("不使用代理")
+
+    def check_param(self):
+        current_quality =input('请填视频质量（默认0,MP4SD）：')
+        current_thread =input('请填最大线程数（默认5）：')
+
+        if(current_quality!=''):
+            i2=int(current_quality)
+            if(i2<=20):
+                self.VIDEO_QUALITY=i2
+                print("3.您选择了{}".format(self.VIDEO_QUALITY))
+
+        if(current_thread!=''):
+            i2=int(current_thread)
+            if(i2<=20):
+                self.MAX_THREADS=i2
+                print("2.您选择了{}".format(self.MAX_THREADS))
+

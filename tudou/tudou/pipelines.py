@@ -32,8 +32,6 @@ class RankingPipeline(object):
     threads_list=[]
     executer=None
     
-    
-
     def open_spider(self,spider):
         self.executer=ThreadPoolExecutor(spider.MAX_THREADS)
         self.PROXIES_LIST=spider.PROXIES_LIST
@@ -100,13 +98,9 @@ class RankingPipeline(object):
         wait(self.threads_list, return_when=ALL_COMPLETED)
         self.write_logging("{}:----------爬虫结束-------------".format(time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))))
         self.logfile.close()
-        # with open("LOGGING.log","a+",encoding="utf-8") as f:
-        #     for item in RankingPipeline.LOGGING:
-        #         f.write("{}\r\n".format(item))
         
     def write_logging(self,text):
         lock.acquire()
-        # with open("LOGGING.log","a+",encoding="utf-8") as f:
         self.logfile.write("{}\r\n".format(text))
         lock.release()
 

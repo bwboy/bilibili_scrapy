@@ -46,7 +46,6 @@ class RankingSpider(scrapy.Spider):
         # 填写并检查初始化参数
         try:
             self.check_param()
-            
         except:
             logger.warning("输入参数有误，已返回默认值。")
         self.getProxiesList() # 装载代理

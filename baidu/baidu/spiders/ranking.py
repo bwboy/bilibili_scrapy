@@ -27,14 +27,13 @@ class RankingSpider(scrapy.Spider):
 
     def __init__(self):
         # 填写并检查初始化参数
-        # try:
-        #     self.check_param()
-        # except:
-        #     logger.warning("输入参数有误，已返回默认值。")
+        try:
+            self.check_param()
+        except:
+            logger.warning("输入参数有误，已返回默认值。")
         self.getProxiesList() # 装载代理
+        # 这里需要拼接url来获取视频排行榜接口地址
         self.start_urls[0]+='?callback=jQuery111104289298378003823_1586930112490&format=json'
-        # self.browser = webdriver.Chrome(self.WEBDRIVER_PATH,chrome_options=chrome_options)
-        # self.browser.implicitly_wait(5)
         super().__init__()
 
     def parse(self, response):
@@ -100,3 +99,24 @@ class RankingSpider(scrapy.Spider):
             [self.PROXIES_LIST.append(i) for i in proxy_list]
         except:
             print("不使用代理")
+
+
+    def check_param(self):
+        target_url =input('请填写排行榜分类地址（默认音乐分类）：')
+        current_count =input('请填下载个数（默认4个）：')
+        current_thread =input('请填最大线程数（默认5）：')
+        if(target_url!=''):
+            self.start_urls[0]=target_url
+            print("1.您选择了{}".format(self.start_urls))
+
+        if(current_thread!=''):
+            i2=int(current_thread)
+            if(i2<=20):
+                self.MAX_THREADS=i2
+                print("2.您选择了{}".format(self.MAX_THREADS))
+
+        if(current_count!=''):
+            i2=int(current_count)
+            if(i2<=20):
+                self.COUNT=i2
+                print("3.您选择了{}".format(self.COUNT))
